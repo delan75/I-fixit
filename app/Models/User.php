@@ -79,4 +79,12 @@ class User extends Authenticatable
             $this->attributes['last_name'] = $parts[1] ?? '';
         }
     }
+
+    /**
+     * Get the cars for the user.
+     */
+    public function cars()
+    {
+        return $this->hasMany(Car::class);
+    }
 }
