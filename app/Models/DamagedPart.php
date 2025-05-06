@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\HasAuthorization;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DamagedPart extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes, HasAuthorization;
 
     /**
      * The attributes that are mass assignable.
@@ -16,6 +18,8 @@ class DamagedPart extends Model
      */
     protected $fillable = [
         'car_id',
+        'created_by',
+        'updated_by',
         'part_name',
         'part_location',
         'damage_description',
@@ -23,6 +27,7 @@ class DamagedPart extends Model
         'needs_replacement',
         'image_path',
         'is_repaired',
+        'status',
     ];
 
     /**
@@ -34,6 +39,7 @@ class DamagedPart extends Model
         'estimated_repair_cost' => 'decimal:2',
         'needs_replacement' => 'boolean',
         'is_repaired' => 'boolean',
+        'deleted_at' => 'datetime',
     ];
 
     /**

@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
+use App\Traits\HasAuthorization;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Supplier extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes, HasAuthorization, Auditable;
 
     /**
      * The attributes that are mass assignable.
@@ -23,6 +26,18 @@ class Supplier extends Model
         'address',
         'website',
         'notes',
+        'created_by',
+        'updated_by',
+        'status',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'deleted_at' => 'datetime',
     ];
 
     /**

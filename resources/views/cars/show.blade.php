@@ -26,6 +26,8 @@
             <!-- Car Details -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6 bg-white border-b border-gray-200">
+                    <x-flash-message />
+
                     <div class="flex justify-between items-start">
                         <div>
                             <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('Car Details') }}</h3>
@@ -73,6 +75,10 @@
                                 <div class="flex justify-between">
                                     <span class="text-sm text-gray-500">{{ __('Color:') }}</span>
                                     <span class="text-sm font-medium">{{ $car->color ?? 'N/A' }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-500">{{ __('Interior Type:') }}</span>
+                                    <span class="text-sm font-medium">{{ $car->interior_type ?? 'N/A' }}</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-sm text-gray-500">{{ __('Body Type:') }}</span>
@@ -164,6 +170,50 @@
                                 <p class="text-sm text-gray-700">{{ $car->notes }}</p>
                             </div>
                         </div>
+                    @endif
+
+                    @if(Auth::user()->role === 'admin' || Auth::id() === $car->created_by)
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <h4 class="text-md font-medium text-gray-900 mb-2">{{ __('Record Information') }}</h4>
+                        <div class="bg-gray-50 p-4 rounded-md">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <div class="flex items-center mb-2">
+                                        <span class="font-medium mr-2">{{ __('Status:') }}</span>
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $car->status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                            {{ ucfirst($car->status) }}
+                                        </span>
+                                    </div>
+                                    @if($car->creator)
+                                    <div class="flex items-center mb-2">
+                                        <span class="font-medium mr-2">{{ __('Created by:') }}</span>
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                            {{ $car->creator->name }}
+                                        </span>
+                                    </div>
+                                    @endif
+                                    <div class="mb-2">
+                                        <span class="font-medium mr-2">{{ __('Created at:') }}</span>
+                                        {{ $car->created_at->format('M d, Y H:i') }}
+                                    </div>
+                                </div>
+                                <div>
+                                    @if($car->updater && $car->updated_at->gt($car->created_at))
+                                    <div class="flex items-center mb-2">
+                                        <span class="font-medium mr-2">{{ __('Last updated by:') }}</span>
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
+                                            {{ $car->updater->name }}
+                                        </span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span class="font-medium mr-2">{{ __('Last updated at:') }}</span>
+                                        {{ $car->updated_at->format('M d, Y H:i') }}
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     @endif
                 </div>
             </div>

@@ -98,6 +98,20 @@
                                             placeholder="Start typing to see colors..." autocomplete="off">
                                     </div>
 
+                                    <!-- Interior Type -->
+                                    <div>
+                                        <label for="interior_type" class="block text-sm font-medium text-gray-700">{{ __('Interior Type') }}</label>
+                                        <select name="interior_type" id="interior_type"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                            <option value="">{{ __('Select Interior Type') }}</option>
+                                            <option value="Cloth" {{ old('interior_type', $car->interior_type ?? '') == 'Cloth' ? 'selected' : '' }}>{{ __('Cloth') }}</option>
+                                            <option value="Leather" {{ old('interior_type', $car->interior_type ?? '') == 'Leather' ? 'selected' : '' }}>{{ __('Leather') }}</option>
+                                            <option value="Leatherette" {{ old('interior_type', $car->interior_type ?? '') == 'Leatherette' ? 'selected' : '' }}>{{ __('Leatherette') }}</option>
+                                            <option value="Alcantara" {{ old('interior_type', $car->interior_type ?? '') == 'Alcantara' ? 'selected' : '' }}>{{ __('Alcantara') }}</option>
+                                            <option value="Mixed" {{ old('interior_type', $car->interior_type ?? '') == 'Mixed' ? 'selected' : '' }}>{{ __('Mixed') }}</option>
+                                        </select>
+                                    </div>
+
                                     <!-- Body Type -->
                                     <div>
                                         <label for="body_type" class="block text-sm font-medium text-gray-700">{{ __('Body Type') }}</label>

@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Supplier;
+use App\Services\AuditService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class SupplierController extends Controller
 {
@@ -17,6 +20,15 @@ class SupplierController extends Controller
 
         // Start with a base query
         $query = Supplier::query();
+
+        // Apply authorization filter - admin sees all, users see only their own
+        $user = Auth::user();
+        if (!$user->hasRole('admin')) {
+            $query->where('created_by', $user->id);
+        }
+
+        // Only show active records
+        $query->where('status', 'active');
 
         // Apply search filter if provided
         if ($search) {
@@ -40,6 +52,7 @@ class SupplierController extends Controller
      */
     public function create()
     {
+        // All authenticated users can create suppliers
         return view('suppliers.create');
     }
 
@@ -60,6 +73,11 @@ class SupplierController extends Controller
             'notes' => 'nullable|string',
         ]);
 
+        // Add created_by and updated_by to the validated data
+        $validated['created_by'] = Auth::id();
+        $validated['updated_by'] = Auth::id();
+        $validated['status'] = 'active';
+
         // Create the supplier
         $supplier = Supplier::create($validated);
 
@@ -72,6 +90,9 @@ class SupplierController extends Controller
      */
     public function show(Supplier $supplier)
     {
+        // Check if user has permission to view this supplier
+        $this->authorize('view', $supplier);
+
         // Load the parts relationship
         $supplier->load('parts.car');
 
@@ -83,6 +104,9 @@ class SupplierController extends Controller
      */
     public function edit(Supplier $supplier)
     {
+        // Check if user has permission to edit this supplier
+        $this->authorize('update', $supplier);
+
         return view('suppliers.edit', compact('supplier'));
     }
 
@@ -91,6 +115,9 @@ class SupplierController extends Controller
      */
     public function update(Request $request, Supplier $supplier)
     {
+        // Check if user has permission to update this supplier
+        $this->authorize('update', $supplier);
+
         // Validate the request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -102,6 +129,9 @@ class SupplierController extends Controller
             'website' => 'nullable|url|max:255',
             'notes' => 'nullable|string',
         ]);
+
+        // Add updated_by to the validated data
+        $validated['updated_by'] = Auth::id();
 
         // Update the supplier
         $supplier->update($validated);
@@ -121,10 +151,22 @@ class SupplierController extends Controller
                 ->with('error', 'Cannot delete supplier with associated parts.');
         }
 
-        // Delete the supplier
-        $supplier->delete();
+        // Check if user has permission to delete this supplier
+        if (Auth::user()->hasRole('admin')) {
+            // Admin can permanently delete
+            $this->authorize('delete', $supplier);
+            $supplier->delete();
+            $message = 'Supplier permanently deleted successfully.';
+        } else {
+            // Regular users can only soft delete (mark as inactive)
+            $this->authorize('softDelete', $supplier);
+            $supplier->status = 'inactive';
+            $supplier->updated_by = Auth::id();
+            $supplier->save();
+            $message = 'Supplier marked as inactive successfully.';
+        }
 
         return redirect()->route('suppliers.index')
-            ->with('success', 'Supplier deleted successfully.');
+            ->with('success', $message);
     }
 }

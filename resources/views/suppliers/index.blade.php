@@ -38,6 +38,8 @@
             <!-- Suppliers List -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
+                    <x-flash-message />
+
                     @if($suppliers->count() > 0)
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
@@ -47,6 +49,9 @@
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Branch') }}</th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Contact Person') }}</th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Phone') }}</th>
+                                        @if(Auth::user()->hasRole('admin'))
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Created By') }}</th>
+                                        @endif
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
@@ -68,14 +73,29 @@
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm text-gray-500">{{ $supplier->email ?? 'N/A' }}</div>
                                             </td>
+                                            @if(Auth::user()->hasRole('admin'))
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                @if($supplier->creator)
+                                                    <div class="text-sm text-gray-500">
+                                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                                            {{ $supplier->creator->name }}
+                                                        </span>
+                                                    </div>
+                                                @else
+                                                    <div class="text-sm text-gray-500">{{ __('System') }}</div>
+                                                @endif
+                                            </td>
+                                            @endif
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <div class="flex space-x-2">
                                                     <a href="{{ route('suppliers.show', $supplier) }}" class="text-green-600 hover:text-green-900">{{ __('View') }}</a>
                                                     <a href="{{ route('suppliers.edit', $supplier) }}" class="text-blue-600 hover:text-blue-900">{{ __('Edit') }}</a>
-                                                    <form action="{{ route('suppliers.destroy', $supplier) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this supplier?');">
+                                                    <form action="{{ route('suppliers.destroy', $supplier) }}" method="POST" class="inline" onsubmit="return confirm('{{ Auth::user()->hasRole('admin') ? 'Are you sure you want to permanently delete this supplier?' : 'Are you sure you want to mark this supplier as inactive?' }}');">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="text-red-600 hover:text-red-900">{{ __('Delete') }}</button>
+                                                        <button type="submit" class="text-red-600 hover:text-red-900">
+                                                            {{ Auth::user()->hasRole('admin') ? __('Delete') : __('Deactivate') }}
+                                                        </button>
                                                     </form>
                                                 </div>
                                             </td>

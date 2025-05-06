@@ -69,6 +69,19 @@
                                 </div>
 
                                 <div>
+                                    <x-input-label for="interior_type" :value="__('Interior Type (Optional)')" />
+                                    <select id="interior_type" name="interior_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                        <option value="">{{ __('Select Interior Type') }}</option>
+                                        <option value="Cloth" {{ old('interior_type', $car->interior_type) == 'Cloth' ? 'selected' : '' }}>{{ __('Cloth') }}</option>
+                                        <option value="Leather" {{ old('interior_type', $car->interior_type) == 'Leather' ? 'selected' : '' }}>{{ __('Leather') }}</option>
+                                        <option value="Leatherette" {{ old('interior_type', $car->interior_type) == 'Leatherette' ? 'selected' : '' }}>{{ __('Leatherette') }}</option>
+                                        <option value="Alcantara" {{ old('interior_type', $car->interior_type) == 'Alcantara' ? 'selected' : '' }}>{{ __('Alcantara') }}</option>
+                                        <option value="Mixed" {{ old('interior_type', $car->interior_type) == 'Mixed' ? 'selected' : '' }}>{{ __('Mixed') }}</option>
+                                    </select>
+                                    <x-input-error :messages="$errors->get('interior_type')" class="mt-2" />
+                                </div>
+
+                                <div>
                                     <x-input-label for="body_type" :value="__('Body Type')" />
                                     <x-text-input id="body_type" class="block mt-1 w-full" type="text" name="body_type" :value="old('body_type', $car->body_type)" required autocomplete="off" placeholder="Start typing to see body types..." />
                                     <x-input-error :messages="$errors->get('body_type')" class="mt-2" />

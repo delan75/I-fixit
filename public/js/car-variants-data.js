@@ -78,7 +78,8 @@ const carVariantsData = {
             '2.7 VVTi',
             '2.8 GD-6',
             '4.0 V6',
-            'Legend',
+            'Legend 50',
+            'Legend 40',
             'Raider',
             'SR',
             'SRX'
