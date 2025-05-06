@@ -28,14 +28,20 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
                                     <x-input-label for="make" :value="__('Make')" />
-                                    <x-text-input id="make" class="block mt-1 w-full" type="text" name="make" :value="old('make', $car->make)" required autofocus />
+                                    <x-text-input id="make" class="block mt-1 w-full" type="text" name="make" :value="old('make', $car->make)" required autofocus autocomplete="off" placeholder="Start typing to see suggestions..." />
                                     <x-input-error :messages="$errors->get('make')" class="mt-2" />
                                 </div>
 
                                 <div>
                                     <x-input-label for="model" :value="__('Model')" />
-                                    <x-text-input id="model" class="block mt-1 w-full" type="text" name="model" :value="old('model', $car->model)" required />
+                                    <x-text-input id="model" class="block mt-1 w-full" type="text" name="model" :value="old('model', $car->model)" required autocomplete="off" placeholder="Select make first..." />
                                     <x-input-error :messages="$errors->get('model')" class="mt-2" />
+                                </div>
+
+                                <div>
+                                    <x-input-label for="variant" :value="__('Variant/Trim')" />
+                                    <x-text-input id="variant" class="block mt-1 w-full" type="text" name="variant" :value="old('variant', $car->variant)" autocomplete="off" placeholder="Select model first..." />
+                                    <x-input-error :messages="$errors->get('variant')" class="mt-2" />
                                 </div>
 
                                 <div>
@@ -58,24 +64,13 @@
 
                                 <div>
                                     <x-input-label for="color" :value="__('Color (Optional)')" />
-                                    <x-text-input id="color" class="block mt-1 w-full" type="text" name="color" :value="old('color', $car->color)" />
+                                    <x-text-input id="color" class="block mt-1 w-full" type="text" name="color" :value="old('color', $car->color)" autocomplete="off" placeholder="Start typing to see colors..." />
                                     <x-input-error :messages="$errors->get('color')" class="mt-2" />
                                 </div>
 
                                 <div>
                                     <x-input-label for="body_type" :value="__('Body Type')" />
-                                    <select id="body_type" name="body_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50" required>
-                                        <option value="">{{ __('Select Body Type') }}</option>
-                                        <option value="Sedan" {{ old('body_type', $car->body_type) == 'Sedan' ? 'selected' : '' }}>{{ __('Sedan') }}</option>
-                                        <option value="Hatchback" {{ old('body_type', $car->body_type) == 'Hatchback' ? 'selected' : '' }}>{{ __('Hatchback') }}</option>
-                                        <option value="SUV" {{ old('body_type', $car->body_type) == 'SUV' ? 'selected' : '' }}>{{ __('SUV') }}</option>
-                                        <option value="Crossover" {{ old('body_type', $car->body_type) == 'Crossover' ? 'selected' : '' }}>{{ __('Crossover') }}</option>
-                                        <option value="Coupe" {{ old('body_type', $car->body_type) == 'Coupe' ? 'selected' : '' }}>{{ __('Coupe') }}</option>
-                                        <option value="Convertible" {{ old('body_type', $car->body_type) == 'Convertible' ? 'selected' : '' }}>{{ __('Convertible') }}</option>
-                                        <option value="Wagon" {{ old('body_type', $car->body_type) == 'Wagon' ? 'selected' : '' }}>{{ __('Wagon') }}</option>
-                                        <option value="Van" {{ old('body_type', $car->body_type) == 'Van' ? 'selected' : '' }}>{{ __('Van') }}</option>
-                                        <option value="Truck" {{ old('body_type', $car->body_type) == 'Truck' ? 'selected' : '' }}>{{ __('Truck') }}</option>
-                                    </select>
+                                    <x-text-input id="body_type" class="block mt-1 w-full" type="text" name="body_type" :value="old('body_type', $car->body_type)" required autocomplete="off" placeholder="Start typing to see body types..." />
                                     <x-input-error :messages="$errors->get('body_type')" class="mt-2" />
                                 </div>
 
@@ -136,6 +131,12 @@
                                     <x-input-label for="auction_house" :value="__('Auction House (Optional)')" />
                                     <x-text-input id="auction_house" class="block mt-1 w-full" type="text" name="auction_house" :value="old('auction_house', $car->auction_house)" />
                                     <x-input-error :messages="$errors->get('auction_house')" class="mt-2" />
+                                </div>
+
+                                <div>
+                                    <x-input-label for="auction_branch" :value="__('Auction Branch (Optional)')" />
+                                    <x-text-input id="auction_branch" class="block mt-1 w-full" type="text" name="auction_branch" :value="old('auction_branch', $car->auction_branch)" placeholder="e.g. Johannesburg, Cape Town, Durban" />
+                                    <x-input-error :messages="$errors->get('auction_branch')" class="mt-2" />
                                 </div>
 
                                 <div>
@@ -200,9 +201,20 @@
                                     <x-input-error :messages="$errors->get('operational_status')" class="mt-2" />
                                 </div>
 
+                                <div>
+                                    <x-input-label for="vehicle_code" :value="__('Vehicle Code')" />
+                                    <select id="vehicle_code" name="vehicle_code" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50" required>
+                                        <option value="">{{ __('Select Vehicle Code') }}</option>
+                                        <option value="Code 2" {{ old('vehicle_code', $car->vehicle_code) == 'Code 2' ? 'selected' : '' }}>{{ __('Code 2') }}</option>
+                                        <option value="Code 3" {{ old('vehicle_code', $car->vehicle_code) == 'Code 3' ? 'selected' : '' }}>{{ __('Code 3') }}</option>
+                                        <option value="Code 4" {{ old('vehicle_code', $car->vehicle_code) == 'Code 4' ? 'selected' : '' }}>{{ __('Code 4') }}</option>
+                                    </select>
+                                    <x-input-error :messages="$errors->get('vehicle_code')" class="mt-2" />
+                                </div>
+
                                 <div class="md:col-span-2">
-                                    <x-input-label for="damage_description" :value="__('Damage Description')" />
-                                    <textarea id="damage_description" name="damage_description" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50" required>{{ old('damage_description', $car->damage_description) }}</textarea>
+                                    <x-input-label for="damage_description" :value="__('Damage Description (Optional)')" />
+                                    <textarea id="damage_description" name="damage_description" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">{{ old('damage_description', $car->damage_description) }}</textarea>
                                     <x-input-error :messages="$errors->get('damage_description')" class="mt-2" />
                                 </div>
                             </div>
@@ -323,4 +335,17 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize all car autocomplete fields
+            CarAutocomplete.initializeAll({
+                makeInputId: 'make',
+                modelInputId: 'model',
+                variantInputId: 'variant',
+                bodyTypeInputId: 'body_type',
+                colorInputId: 'color'
+            });
+        });
+    </script>
 </x-app-layout>

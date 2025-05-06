@@ -22,6 +22,7 @@ class SupplierController extends Controller
         if ($search) {
             $query->where(function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('branch_name', 'like', "%{$search}%")
                   ->orWhere('contact_person', 'like', "%{$search}%")
                   ->orWhere('phone', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%");
@@ -50,6 +51,7 @@ class SupplierController extends Controller
         // Validate the request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'branch_name' => 'nullable|string|max:255',
             'contact_person' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
@@ -92,6 +94,7 @@ class SupplierController extends Controller
         // Validate the request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'branch_name' => 'nullable|string|max:255',
             'contact_person' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',

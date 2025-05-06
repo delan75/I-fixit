@@ -18,6 +18,7 @@ class Car extends Model
         'user_id',
         'make',
         'model',
+        'variant',
         'year',
         'vin',
         'registration_number',
@@ -31,6 +32,7 @@ class Car extends Model
         'purchase_date',
         'purchase_price',
         'auction_house',
+        'auction_branch',
         'auction_lot_number',
         'damage_description',
         'damage_severity',
@@ -91,7 +93,7 @@ class Car extends Model
      */
     public function images()
     {
-        return $this->hasMany(CarImage::class);
+        return $this->morphMany(Image::class, 'imageable');
     }
 
     /**
@@ -162,7 +164,7 @@ class Car extends Model
     }
 
     /**
-     * Calculate the profit or loss on the car.
+     * Calculate the actual profit or loss on the car (if sold).
      */
     public function getProfitLossAttribute()
     {
@@ -174,7 +176,19 @@ class Car extends Model
     }
 
     /**
-     * Calculate the ROI percentage.
+     * Calculate the projected profit or loss on the car based on estimated market value.
+     */
+    public function getProjectedProfitLossAttribute()
+    {
+        if (!$this->estimated_market_value) {
+            return null;
+        }
+
+        return $this->estimated_market_value - $this->getTotalInvestmentAttribute();
+    }
+
+    /**
+     * Calculate the actual ROI percentage (if sold).
      */
     public function getRoiPercentageAttribute()
     {
@@ -183,6 +197,18 @@ class Car extends Model
         }
 
         return ($this->getProfitLossAttribute() / $this->getTotalInvestmentAttribute()) * 100;
+    }
+
+    /**
+     * Calculate the projected ROI percentage based on estimated market value.
+     */
+    public function getProjectedRoiPercentageAttribute()
+    {
+        if (!$this->estimated_market_value || $this->getTotalInvestmentAttribute() == 0) {
+            return null;
+        }
+
+        return ($this->getProjectedProfitLossAttribute() / $this->getTotalInvestmentAttribute()) * 100;
     }
 
     /**

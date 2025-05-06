@@ -27,7 +27,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6 bg-white border-b border-gray-200">
                     <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('Supplier Information') }}</h3>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <div class="space-y-4">
@@ -35,24 +35,29 @@
                                     <h4 class="text-sm font-medium text-gray-500">{{ __('Name') }}</h4>
                                     <p class="mt-1 text-sm text-gray-900">{{ $supplier->name }}</p>
                                 </div>
-                                
+
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-500">{{ __('Branch') }}</h4>
+                                    <p class="mt-1 text-sm text-gray-900">{{ $supplier->branch_name ?? 'N/A' }}</p>
+                                </div>
+
                                 <div>
                                     <h4 class="text-sm font-medium text-gray-500">{{ __('Contact Person') }}</h4>
                                     <p class="mt-1 text-sm text-gray-900">{{ $supplier->contact_person ?? 'N/A' }}</p>
                                 </div>
-                                
+
                                 <div>
                                     <h4 class="text-sm font-medium text-gray-500">{{ __('Phone') }}</h4>
                                     <p class="mt-1 text-sm text-gray-900">{{ $supplier->phone ?? 'N/A' }}</p>
                                 </div>
-                                
+
                                 <div>
                                     <h4 class="text-sm font-medium text-gray-500">{{ __('Email') }}</h4>
                                     <p class="mt-1 text-sm text-gray-900">{{ $supplier->email ?? 'N/A' }}</p>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div>
                             <div class="space-y-4">
                                 <div>
@@ -65,12 +70,12 @@
                                         @endif
                                     </p>
                                 </div>
-                                
+
                                 <div>
                                     <h4 class="text-sm font-medium text-gray-500">{{ __('Address') }}</h4>
                                     <p class="mt-1 text-sm text-gray-900 whitespace-pre-line">{{ $supplier->address ?? 'N/A' }}</p>
                                 </div>
-                                
+
                                 <div>
                                     <h4 class="text-sm font-medium text-gray-500">{{ __('Notes') }}</h4>
                                     <p class="mt-1 text-sm text-gray-900 whitespace-pre-line">{{ $supplier->notes ?? 'N/A' }}</p>
