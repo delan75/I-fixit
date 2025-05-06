@@ -52,6 +52,13 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
+        // Debugging: Log user authentication status
+        if (!Auth::check()) {
+            logger('User not authenticated after registration.');
+        } else {
+            logger('User authenticated successfully.');
+        }
+
         return redirect(RouteServiceProvider::HOME);
     }
 }

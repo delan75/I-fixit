@@ -4,6 +4,10 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\CarImageController;
 use App\Http\Controllers\DamagedPartController;
+use App\Http\Controllers\LaborController;
+use App\Http\Controllers\PaintingController;
+use App\Http\Controllers\PartController;
+use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Route;
 
@@ -45,9 +49,38 @@ Route::middleware('auth')->group(function () {
     Route::get('cars/{car}/damaged-parts/{damagedPart}/edit', [DamagedPartController::class, 'edit'])->name('damaged_parts.edit');
     Route::put('cars/{car}/damaged-parts/{damagedPart}', [DamagedPartController::class, 'update'])->name('damaged_parts.update');
     Route::delete('cars/{car}/damaged-parts/{damagedPart}', [DamagedPartController::class, 'destroy'])->name('damaged_parts.destroy');
+    Route::delete('cars/{car}/damaged-parts/{damagedPart}/images/{image}', [DamagedPartController::class, 'destroyImage'])->name('damaged_part_images.destroy');
 
     // Supplier routes
     Route::resource('suppliers', SupplierController::class);
+
+    // Parts routes
+    Route::get('cars/{car}/parts/create', [PartController::class, 'create'])->name('parts.create');
+    Route::post('cars/{car}/parts', [PartController::class, 'store'])->name('parts.store');
+    Route::get('cars/{car}/parts/{part}/edit', [PartController::class, 'edit'])->name('parts.edit');
+    Route::put('cars/{car}/parts/{part}', [PartController::class, 'update'])->name('parts.update');
+    Route::delete('cars/{car}/parts/{part}', [PartController::class, 'destroy'])->name('parts.destroy');
+
+    // Labor routes
+    Route::get('cars/{car}/labor/create', [LaborController::class, 'create'])->name('labor.create');
+    Route::post('cars/{car}/labor', [LaborController::class, 'store'])->name('labor.store');
+    Route::get('cars/{car}/labor/{labor}/edit', [LaborController::class, 'edit'])->name('labor.edit');
+    Route::put('cars/{car}/labor/{labor}', [LaborController::class, 'update'])->name('labor.update');
+    Route::delete('cars/{car}/labor/{labor}', [LaborController::class, 'destroy'])->name('labor.destroy');
+
+    // Painting routes
+    Route::get('cars/{car}/painting/create', [PaintingController::class, 'create'])->name('painting.create');
+    Route::post('cars/{car}/painting', [PaintingController::class, 'store'])->name('painting.store');
+    Route::get('cars/{car}/painting/{painting}/edit', [PaintingController::class, 'edit'])->name('painting.edit');
+    Route::put('cars/{car}/painting/{painting}', [PaintingController::class, 'update'])->name('painting.update');
+    Route::delete('cars/{car}/painting/{painting}', [PaintingController::class, 'destroy'])->name('painting.destroy');
+
+    // Sale routes
+    Route::get('cars/{car}/sale/create', [SaleController::class, 'create'])->name('sales.create');
+    Route::post('cars/{car}/sale', [SaleController::class, 'store'])->name('sales.store');
+    Route::get('cars/{car}/sale/{sale}/edit', [SaleController::class, 'edit'])->name('sales.edit');
+    Route::put('cars/{car}/sale/{sale}', [SaleController::class, 'update'])->name('sales.update');
+    Route::delete('cars/{car}/sale/{sale}', [SaleController::class, 'destroy'])->name('sales.destroy');
 });
 
 require __DIR__.'/auth.php';

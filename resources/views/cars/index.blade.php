@@ -94,18 +94,18 @@
                                                 <div class="flex items-center">
                                                     <div>
                                                         <div class="text-sm font-medium text-gray-900">
-                                                            {{ $car->year }} {{ $car->make }} {{ $car->model }}
+                                                            {{ $car->year }} {{ $car->make }} {{ $car->model }} {{ $car->variant ?? '' }}
                                                         </div>
                                                         <div class="text-sm text-gray-500">{{ $car->vin ?? 'No VIN' }}</div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                                    @if($car->current_phase == 'bidding') bg-blue-100 text-blue-800 
-                                                    @elseif($car->current_phase == 'fixing') bg-yellow-100 text-yellow-800 
-                                                    @elseif($car->current_phase == 'dealership') bg-green-100 text-green-800 
-                                                    @elseif($car->current_phase == 'sold') bg-purple-100 text-purple-800 
+                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                                                    @if($car->current_phase == 'bidding') bg-blue-100 text-blue-800
+                                                    @elseif($car->current_phase == 'fixing') bg-yellow-100 text-yellow-800
+                                                    @elseif($car->current_phase == 'dealership') bg-green-100 text-green-800
+                                                    @elseif($car->current_phase == 'sold') bg-purple-100 text-purple-800
                                                     @endif">
                                                     {{ ucfirst($car->current_phase) }}
                                                 </span>

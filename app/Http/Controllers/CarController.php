@@ -88,6 +88,14 @@ class CarController extends Controller
         // Validate based on the current step
         $validated = $this->validateStep($request, $step);
 
+        // Ensure purchase_date is set to current date if not provided
+        if (!isset($validated['purchase_date'])) {
+            $validated['purchase_date'] = now()->toDateString();
+        } else {
+            // Make sure purchase_date is in the correct format
+            $validated['purchase_date'] = date('Y-m-d', strtotime($validated['purchase_date']));
+        }
+
         // Add user_id to the validated data for new cars
         if (!isset($car)) {
             $validated['user_id'] = Auth::id();
@@ -173,6 +181,7 @@ class CarController extends Controller
             $rules = [
                 'make' => 'required|string|max:255',
                 'model' => 'required|string|max:255',
+                'variant' => 'nullable|string|max:255',
                 'year' => 'required|integer|min:1900|max:' . (date('Y') + 1),
                 'vin' => 'nullable|string|max:255',
                 'registration_number' => 'nullable|string|max:255',
@@ -188,9 +197,10 @@ class CarController extends Controller
         // Step 2: Purchase Information
         elseif ($step == 2) {
             $rules = [
-                'purchase_date' => 'required|date',
+                'purchase_date' => 'nullable|date', // Updated to allow null values
                 'purchase_price' => 'required|numeric|min:0',
                 'auction_house' => 'nullable|string|max:255',
+                'auction_branch' => 'nullable|string|max:255',
                 'auction_lot_number' => 'nullable|string|max:255',
                 'transportation_cost' => 'nullable|numeric|min:0',
                 'registration_papers_cost' => 'nullable|numeric|min:0',
@@ -202,10 +212,10 @@ class CarController extends Controller
         // Step 3: Damage Information
         elseif ($step == 3) {
             $rules = [
-                'damage_description' => 'required|string',
+                'damage_description' => 'nullable|string', // Changed to nullable
                 'damage_severity' => 'required|in:light,moderate,severe',
                 'operational_status' => 'required|in:running,non-running',
-                'vehicle_code' => 'required|in:code_2,code_3,code_4',
+                'vehicle_code' => 'required|in:Code 2,Code 3,Code 4',
             ];
         }
         // Step 4: Status & Projections
@@ -265,6 +275,14 @@ class CarController extends Controller
             // Validate based on the current step
             $validated = $this->validateStep($request, $step);
 
+            // Ensure purchase_date is set to current date if not provided
+            if (!isset($validated['purchase_date'])) {
+                $validated['purchase_date'] = now()->toDateString(); // Set to current date if not provided
+            } else {
+                // Make sure purchase_date is in the correct format
+                $validated['purchase_date'] = date('Y-m-d', strtotime($validated['purchase_date']));
+            }
+
             // Update the car with the validated data
             $car->update($validated);
 
@@ -289,6 +307,7 @@ class CarController extends Controller
         $validated = $request->validate([
             'make' => 'required|string|max:255',
             'model' => 'required|string|max:255',
+            'variant' => 'nullable|string|max:255',
             'year' => 'required|integer|min:1900|max:' . (date('Y') + 1),
             'vin' => 'nullable|string|max:255',
             'registration_number' => 'nullable|string|max:255',
@@ -302,11 +321,12 @@ class CarController extends Controller
             'purchase_date' => 'required|date',
             'purchase_price' => 'required|numeric|min:0',
             'auction_house' => 'nullable|string|max:255',
+            'auction_branch' => 'nullable|string|max:255',
             'auction_lot_number' => 'nullable|string|max:255',
-            'damage_description' => 'required|string',
+            'damage_description' => 'nullable|string',
             'damage_severity' => 'required|in:light,moderate,severe',
             'operational_status' => 'required|in:running,non-running',
-            'vehicle_code' => 'required|in:code_2,code_3,code_4',
+            'vehicle_code' => 'required|in:Code 2,Code 3,Code 4',
             'current_phase' => 'required|in:bidding,fixing,dealership,sold',
             'repair_start_date' => 'nullable|date',
             'repair_end_date' => 'nullable|date',
@@ -322,6 +342,14 @@ class CarController extends Controller
             'estimated_market_value' => 'nullable|numeric|min:0',
             'notes' => 'nullable|string',
         ]);
+
+        // Ensure purchase_date is set to current date if not provided
+        if (!isset($validated['purchase_date'])) {
+            $validated['purchase_date'] = now()->toDateString(); // Set to current date if not provided
+        } else {
+            // Make sure purchase_date is in the correct format
+            $validated['purchase_date'] = date('Y-m-d', strtotime($validated['purchase_date']));
+        }
 
         // Update the car
         $car->update($validated);

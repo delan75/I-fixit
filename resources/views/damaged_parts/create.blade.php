@@ -62,6 +62,11 @@
                                 </div>
 
                                 <div class="flex items-center mt-8">
+                                    <input id="needs_replacement" type="checkbox" name="needs_replacement" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50" {{ old('needs_replacement') ? 'checked' : '' }}>
+                                    <label for="needs_replacement" class="ml-2 text-sm text-gray-600">{{ __('This part needs replacement') }}</label>
+                                </div>
+
+                                <div class="flex items-center mt-4">
                                     <input id="is_repaired" type="checkbox" name="is_repaired" class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50" {{ old('is_repaired') ? 'checked' : '' }}>
                                     <label for="is_repaired" class="ml-2 text-sm text-gray-600">{{ __('This part has been repaired') }}</label>
                                 </div>

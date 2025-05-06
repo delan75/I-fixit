@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Supplier extends Model
+class Image extends Model
 {
     use HasFactory;
 
@@ -15,21 +15,18 @@ class Supplier extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'branch_name',
-        'contact_person',
-        'phone',
-        'email',
-        'address',
-        'website',
-        'notes',
+        'image_path',
+        'description',
+        'image_type',
+        'imageable_id',
+        'imageable_type',
     ];
 
     /**
-     * Get the parts for the supplier.
+     * Get the parent imageable model (car, damaged part, etc).
      */
-    public function parts()
+    public function imageable()
     {
-        return $this->hasMany(Part::class);
+        return $this->morphTo();
     }
 }

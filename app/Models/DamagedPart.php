@@ -43,4 +43,12 @@ class DamagedPart extends Model
     {
         return $this->belongsTo(Car::class);
     }
+
+    /**
+     * Get the images for the damaged part.
+     */
+    public function images()
+    {
+        return $this->morphMany(Image::class, 'imageable');
+    }
 }

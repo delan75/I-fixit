@@ -55,6 +55,10 @@
                                     <span class="text-sm font-medium">{{ $car->model }}</span>
                                 </div>
                                 <div class="flex justify-between">
+                                    <span class="text-sm text-gray-500">{{ __('Variant/Trim:') }}</span>
+                                    <span class="text-sm font-medium">{{ $car->variant ?? 'N/A' }}</span>
+                                </div>
+                                <div class="flex justify-between">
                                     <span class="text-sm text-gray-500">{{ __('Year:') }}</span>
                                     <span class="text-sm font-medium">{{ $car->year }}</span>
                                 </div>
@@ -103,6 +107,10 @@
                                 <div class="flex justify-between">
                                     <span class="text-sm text-gray-500">{{ __('Damage Severity:') }}</span>
                                     <span class="text-sm font-medium">{{ ucfirst($car->damage_severity) }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-500">{{ __('Vehicle Code:') }}</span>
+                                    <span class="text-sm font-medium">{{ $car->vehicle_code ?? 'N/A' }}</span>
                                 </div>
                             </div>
                         </div>
@@ -271,6 +279,281 @@
                 </div>
             </div>
 
+            <!-- Parts -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-6 bg-white border-b border-gray-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-medium text-gray-900">{{ __('Parts') }}</h3>
+                        <a href="{{ route('parts.create', $car) }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            {{ __('Add Part') }}
+                        </a>
+                    </div>
+
+                    @if($car->parts->count() > 0)
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Name') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Condition') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Quantity') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Unit Price') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Total Price') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Actions') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    @foreach($car->parts as $part)
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $part->name }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ ucfirst($part->condition) }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $part->quantity }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R {{ number_format($part->unit_price, 2) }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R {{ number_format($part->total_price, 2) }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <div class="flex space-x-2">
+                                                    <a href="{{ route('parts.edit', [$car, $part]) }}" class="text-blue-600 hover:text-blue-900">{{ __('Edit') }}</a>
+                                                    <form action="{{ route('parts.destroy', [$car, $part]) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this part?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="text-red-600 hover:text-red-900">{{ __('Delete') }}</button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="py-8 flex flex-col items-center justify-center text-center">
+                            <div class="bg-gray-100 p-3 rounded-full mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </div>
+                            <h4 class="text-lg font-medium text-gray-900 mb-2">{{ __('No parts recorded') }}</h4>
+                            <p class="text-gray-600 mb-4">{{ __('You haven\'t added any parts for this car yet.') }}</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Labor -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-6 bg-white border-b border-gray-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-medium text-gray-900">{{ __('Labor') }}</h3>
+                        <a href="{{ route('labor.create', $car) }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            {{ __('Add Labor') }}
+                        </a>
+                    </div>
+
+                    @if($car->laborEntries->count() > 0)
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Service Type') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Provider') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Hours') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Total Cost') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Service Date') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Actions') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    @foreach($car->laborEntries as $labor)
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $labor->service_type }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $labor->provider_name }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $labor->hours ?? 'N/A' }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R {{ number_format($labor->total_cost, 2) }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $labor->service_date->format('d M Y') }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <div class="flex space-x-2">
+                                                    <a href="{{ route('labor.edit', [$car, $labor]) }}" class="text-blue-600 hover:text-blue-900">{{ __('Edit') }}</a>
+                                                    <form action="{{ route('labor.destroy', [$car, $labor]) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this labor entry?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="text-red-600 hover:text-red-900">{{ __('Delete') }}</button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="py-8 flex flex-col items-center justify-center text-center">
+                            <div class="bg-gray-100 p-3 rounded-full mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </div>
+                            <h4 class="text-lg font-medium text-gray-900 mb-2">{{ __('No labor entries recorded') }}</h4>
+                            <p class="text-gray-600 mb-4">{{ __('You haven\'t added any labor entries for this car yet.') }}</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Painting -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-6 bg-white border-b border-gray-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-medium text-gray-900">{{ __('Painting') }}</h3>
+                        <a href="{{ route('painting.create', $car) }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            {{ __('Add Painting') }}
+                        </a>
+                    </div>
+
+                    @if($car->paintingEntries->count() > 0)
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Type') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Provider') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Material Cost') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Labor Cost') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Total Cost') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Actions') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    @foreach($car->paintingEntries as $painting)
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ ucfirst($painting->painting_type) }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $painting->provider_name }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R {{ number_format($painting->material_cost ?? 0, 2) }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R {{ number_format($painting->labor_cost ?? 0, 2) }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">R {{ number_format($painting->total_cost, 2) }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <div class="flex space-x-2">
+                                                    <a href="{{ route('painting.edit', [$car, $painting]) }}" class="text-blue-600 hover:text-blue-900">{{ __('Edit') }}</a>
+                                                    <form action="{{ route('painting.destroy', [$car, $painting]) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this painting entry?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="text-red-600 hover:text-red-900">{{ __('Delete') }}</button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="py-8 flex flex-col items-center justify-center text-center">
+                            <div class="bg-gray-100 p-3 rounded-full mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </div>
+                            <h4 class="text-lg font-medium text-gray-900 mb-2">{{ __('No painting entries recorded') }}</h4>
+                            <p class="text-gray-600 mb-4">{{ __('You haven\'t added any painting entries for this car yet.') }}</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Sale Information -->
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-6 bg-white border-b border-gray-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-medium text-gray-900">{{ __('Sale Information') }}</h3>
+                        @if(!$car->sale)
+                            <a href="{{ route('sales.create', $car) }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                                {{ __('Add Sale Information') }}
+                            </a>
+                        @else
+                            <a href="{{ route('sales.edit', [$car, $car->sale]) }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                {{ __('Edit Sale Information') }}
+                            </a>
+                        @endif
+                    </div>
+
+                    @if($car->sale)
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="text-md font-medium text-gray-900 mb-2">{{ __('Listing Details') }}</h4>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-500">{{ __('Listing Date:') }}</span>
+                                        <span class="text-sm font-medium">{{ $car->sale->listing_date->format('d M Y') }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-500">{{ __('Asking Price:') }}</span>
+                                        <span class="text-sm font-medium">R {{ number_format($car->sale->asking_price, 2) }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-500">{{ __('Platform:') }}</span>
+                                        <span class="text-sm font-medium">{{ $car->sale->platform }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h4 class="text-md font-medium text-gray-900 mb-2">{{ __('Sale Details') }}</h4>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-500">{{ __('Selling Price:') }}</span>
+                                        <span class="text-sm font-medium">{{ $car->sale->selling_price ? 'R ' . number_format($car->sale->selling_price, 2) : 'Not sold yet' }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-500">{{ __('Sale Date:') }}</span>
+                                        <span class="text-sm font-medium">{{ $car->sale->sale_date ? $car->sale->sale_date->format('d M Y') : 'Not sold yet' }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-500">{{ __('Buyer:') }}</span>
+                                        <span class="text-sm font-medium">{{ $car->sale->buyer_name ?? 'Not sold yet' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if($car->sale->notes)
+                            <div class="mt-4">
+                                <h4 class="text-md font-medium text-gray-900 mb-2">{{ __('Sale Notes') }}</h4>
+                                <div class="bg-gray-50 p-4 rounded-md">
+                                    <p class="text-sm text-gray-700">{{ $car->sale->notes }}</p>
+                                </div>
+                            </div>
+                        @endif
+                    @else
+                        <div class="py-8 flex flex-col items-center justify-center text-center">
+                            <div class="bg-gray-100 p-3 rounded-full mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h4 class="text-lg font-medium text-gray-900 mb-2">{{ __('No sale information') }}</h4>
+                            <p class="text-gray-600 mb-4">{{ __('You haven\'t added any sale information for this car yet.') }}</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
             <!-- Financial Summary -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
@@ -335,33 +618,35 @@
                                     <span class="text-sm font-medium">R {{ number_format($car->dealership_discount, 2) }}</span>
                                 </div>
 
-                                @if($car->sale)
-                                    <div class="flex justify-between">
-                                        <span class="text-sm text-gray-500">{{ __('Actual Selling Price:') }}</span>
-                                        <span class="text-sm font-medium">R {{ number_format($car->sale->selling_price, 2) }}</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-sm text-gray-500">{{ __('Commission & Fees:') }}</span>
-                                        <span class="text-sm font-medium">R {{ number_format(($car->sale->commission + $car->sale->fees), 2) }}</span>
-                                    </div>
-                                    <div class="pt-2 border-t border-gray-200 flex justify-between font-medium">
-                                        <span class="text-sm text-gray-900">{{ __('Actual Profit/Loss:') }}</span>
-                                        <span class="text-sm {{ $car->getProfitLossAttribute() >= 0 ? 'text-green-600' : 'text-red-600' }}">
-                                            R {{ number_format($car->getProfitLossAttribute(), 2) }}
-                                            ({{ number_format($car->getRoiPercentageAttribute(), 1) }}%)
-                                        </span>
-                                    </div>
-                                @else
-                                    <div class="pt-2 border-t border-gray-200 flex justify-between font-medium">
-                                        <span class="text-sm text-gray-900">{{ __('Projected Profit/Loss:') }}</span>
-                                        @php
-                                            $projectedProfit = ($car->estimated_market_value ?? 0) - $car->getTotalInvestmentAttribute() - $car->dealership_discount;
-                                            $projectedRoi = $car->getTotalInvestmentAttribute() > 0 ? ($projectedProfit / $car->getTotalInvestmentAttribute()) * 100 : 0;
-                                        @endphp
-                                        <span class="text-sm {{ $projectedProfit >= 0 ? 'text-green-600' : 'text-red-600' }}">
-                                            R {{ number_format($projectedProfit, 2) }}
-                                            ({{ number_format($projectedRoi, 1) }}%)
-                                        </span>
+                                <!-- Projected Profit/Loss (always shown) -->
+                                <div class="pt-2 border-t border-gray-200 flex justify-between font-medium">
+                                    <span class="text-sm text-gray-900">{{ __('Projected Profit/Loss:') }}</span>
+                                    <span class="text-sm {{ $car->getProjectedProfitLossAttribute() >= 0 ? 'text-green-600' : 'text-red-600' }}">
+                                        R {{ number_format($car->getProjectedProfitLossAttribute(), 2) }}
+                                        ({{ number_format($car->getProjectedRoiPercentageAttribute(), 1) }}%)
+                                    </span>
+                                </div>
+
+                                @if($car->sale && $car->sale->selling_price)
+                                    <div class="mt-4 pt-2 border-t border-gray-200">
+                                        <h4 class="text-md font-medium text-gray-900 mb-2">{{ __('Actual Sale Results') }}</h4>
+                                        <div class="space-y-2">
+                                            <div class="flex justify-between">
+                                                <span class="text-sm text-gray-500">{{ __('Actual Selling Price:') }}</span>
+                                                <span class="text-sm font-medium">R {{ number_format($car->sale->selling_price, 2) }}</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-sm text-gray-500">{{ __('Commission & Fees:') }}</span>
+                                                <span class="text-sm font-medium">R {{ number_format(($car->sale->commission + $car->sale->fees), 2) }}</span>
+                                            </div>
+                                            <div class="pt-2 border-t border-gray-200 flex justify-between font-medium">
+                                                <span class="text-sm text-gray-900">{{ __('Actual Profit/Loss:') }}</span>
+                                                <span class="text-sm {{ $car->getProfitLossAttribute() >= 0 ? 'text-green-600' : 'text-red-600' }}">
+                                                    R {{ number_format($car->getProfitLossAttribute(), 2) }}
+                                                    ({{ number_format($car->getRoiPercentageAttribute(), 1) }}%)
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                 @endif
                             </div>
