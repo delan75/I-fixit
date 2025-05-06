@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
+use App\Traits\HasAuthorization;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Car extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes, HasAuthorization, Auditable;
 
     /**
      * The attributes that are mass assignable.
@@ -16,6 +19,8 @@ class Car extends Model
      */
     protected $fillable = [
         'user_id',
+        'created_by',
+        'updated_by',
         'make',
         'model',
         'variant',
@@ -23,6 +28,7 @@ class Car extends Model
         'vin',
         'registration_number',
         'color',
+        'interior_type',
         'body_type',
         'engine_size',
         'fuel_type',
@@ -54,6 +60,7 @@ class Car extends Model
         'notes',
         'form_completed',
         'form_step',
+        'status',
     ];
 
     /**
@@ -78,6 +85,7 @@ class Car extends Model
         'estimated_market_value' => 'decimal:2',
         'form_completed' => 'boolean',
         'form_step' => 'integer',
+        'deleted_at' => 'datetime',
     ];
 
     /**

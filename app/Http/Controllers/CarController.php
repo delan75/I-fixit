@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Car;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class CarController extends Controller
 {
@@ -21,6 +22,15 @@ class CarController extends Controller
 
         // Start with a base query
         $query = Car::query();
+
+        // Apply authorization filter - admin sees all, users see only their own
+        $user = Auth::user();
+        if ($user->role !== 'admin') {
+            $query->where('created_by', $user->id);
+        }
+
+        // Only show active records
+        $query->where('status', 'active');
 
         // Apply filters if provided
         if ($phase) {
@@ -43,9 +53,16 @@ class CarController extends Controller
         $cars = $query->orderBy('created_at', 'desc')->paginate(10);
 
         // Get unique makes, models, and years for filter dropdowns
-        $makes = Car::select('make')->distinct()->pluck('make');
-        $models = Car::select('model')->distinct()->pluck('model');
-        $years = Car::select('year')->distinct()->orderBy('year', 'desc')->pluck('year');
+        // For regular users, only show their own data for filters
+        if ($user->role === 'admin') {
+            $makes = Car::select('make')->distinct()->pluck('make');
+            $models = Car::select('model')->distinct()->pluck('model');
+            $years = Car::select('year')->distinct()->orderBy('year', 'desc')->pluck('year');
+        } else {
+            $makes = Car::where('created_by', $user->id)->select('make')->distinct()->pluck('make');
+            $models = Car::where('created_by', $user->id)->select('model')->distinct()->pluck('model');
+            $years = Car::where('created_by', $user->id)->select('year')->distinct()->orderBy('year', 'desc')->pluck('year');
+        }
 
         return view('cars.index', compact('cars', 'makes', 'models', 'years', 'phase', 'make', 'model', 'year'));
     }
@@ -83,6 +100,9 @@ class CarController extends Controller
         // If car_id is provided, load the car for updating
         if ($car_id) {
             $car = Car::findOrFail($car_id);
+
+            // Check if user has permission to update this car
+            $this->authorize('update', $car);
         }
 
         // Validate based on the current step
@@ -96,14 +116,20 @@ class CarController extends Controller
             $validated['purchase_date'] = date('Y-m-d', strtotime($validated['purchase_date']));
         }
 
-        // Add user_id to the validated data for new cars
+        // Add user_id and created_by to the validated data for new cars
         if (!isset($car)) {
             $validated['user_id'] = Auth::id();
+            $validated['created_by'] = Auth::id();
+            $validated['updated_by'] = Auth::id();
             $validated['form_step'] = $step;
+            $validated['status'] = 'active';
 
             // Create the car
             $car = Car::create($validated);
         } else {
+            // Add updated_by to the validated data
+            $validated['updated_by'] = Auth::id();
+
             // Update the car with the validated data
             $car->update($validated);
 
@@ -186,6 +212,7 @@ class CarController extends Controller
                 'vin' => 'nullable|string|max:255',
                 'registration_number' => 'nullable|string|max:255',
                 'color' => 'nullable|string|max:255',
+                'interior_type' => 'nullable|string|max:255',
                 'body_type' => 'required|string|max:255',
                 'engine_size' => 'nullable|string|max:255',
                 'fuel_type' => 'required|string|max:255',
@@ -241,6 +268,9 @@ class CarController extends Controller
      */
     public function show(Car $car)
     {
+        // Check if user has permission to view this car
+        $this->authorize('view', $car);
+
         // Load relationships
         $car->load([
             'images',
@@ -260,6 +290,9 @@ class CarController extends Controller
      */
     public function edit(Car $car)
     {
+        // Check if user has permission to edit this car
+        $this->authorize('update', $car);
+
         return view('cars.edit', compact('car'));
     }
 
@@ -268,6 +301,9 @@ class CarController extends Controller
      */
     public function update(Request $request, Car $car)
     {
+        // Check if user has permission to update this car
+        $this->authorize('update', $car);
+
         $step = $request->input('step');
 
         // If step is provided, we're updating a specific step of the form
@@ -282,6 +318,9 @@ class CarController extends Controller
                 // Make sure purchase_date is in the correct format
                 $validated['purchase_date'] = date('Y-m-d', strtotime($validated['purchase_date']));
             }
+
+            // Add updated_by to the validated data
+            $validated['updated_by'] = Auth::id();
 
             // Update the car with the validated data
             $car->update($validated);
@@ -312,6 +351,7 @@ class CarController extends Controller
             'vin' => 'nullable|string|max:255',
             'registration_number' => 'nullable|string|max:255',
             'color' => 'nullable|string|max:255',
+            'interior_type' => 'nullable|string|max:255',
             'body_type' => 'required|string|max:255',
             'engine_size' => 'nullable|string|max:255',
             'fuel_type' => 'required|string|max:255',
@@ -351,6 +391,9 @@ class CarController extends Controller
             $validated['purchase_date'] = date('Y-m-d', strtotime($validated['purchase_date']));
         }
 
+        // Add updated_by to the validated data
+        $validated['updated_by'] = Auth::id();
+
         // Update the car
         $car->update($validated);
 
@@ -376,10 +419,22 @@ class CarController extends Controller
      */
     public function destroy(Car $car)
     {
-        // Delete the car
-        $car->delete();
+        // Check if user has permission to delete this car
+        if (Auth::user()->role === 'admin') {
+            // Admin can permanently delete
+            $this->authorize('delete', $car);
+            $car->delete();
+            $message = 'Car permanently deleted successfully.';
+        } else {
+            // Regular users can only soft delete (mark as inactive)
+            $this->authorize('softDelete', $car);
+            $car->status = 'inactive';
+            $car->updated_by = Auth::id();
+            $car->save();
+            $message = 'Car marked as inactive successfully.';
+        }
 
         return redirect()->route('cars.index')
-            ->with('success', 'Car deleted successfully.');
+            ->with('success', $message);
     }
 }

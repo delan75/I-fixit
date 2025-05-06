@@ -42,7 +42,7 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-gray-600">{{ __('Total Cars') }}</p>
-                                <p class="text-3xl font-bold text-gray-900">{{ \App\Models\Car::count() }}</p>
+                                <p class="text-3xl font-bold text-gray-900">{{ $totalCars }}</p>
                             </div>
                             <div class="p-3 bg-green-100 rounded-full">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -59,7 +59,7 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-gray-600">{{ __('Cars in Repair') }}</p>
-                                <p class="text-3xl font-bold text-gray-900">{{ \App\Models\Car::where('current_phase', 'fixing')->count() }}</p>
+                                <p class="text-3xl font-bold text-gray-900">{{ $carsByPhase['fixing'] ?? 0 }}</p>
                             </div>
                             <div class="p-3 bg-blue-100 rounded-full">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -77,7 +77,7 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-gray-600">{{ __('At Dealership') }}</p>
-                                <p class="text-3xl font-bold text-gray-900">{{ \App\Models\Car::where('current_phase', 'dealership')->count() }}</p>
+                                <p class="text-3xl font-bold text-gray-900">{{ $carsByPhase['dealership'] ?? 0 }}</p>
                             </div>
                             <div class="p-3 bg-yellow-100 rounded-full">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -94,7 +94,7 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-gray-600">{{ __('Cars Sold') }}</p>
-                                <p class="text-3xl font-bold text-gray-900">{{ \App\Models\Car::where('current_phase', 'sold')->count() }}</p>
+                                <p class="text-3xl font-bold text-gray-900">{{ $carsByPhase['sold'] ?? 0 }}</p>
                             </div>
                             <div class="p-3 bg-purple-100 rounded-full">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -161,9 +161,7 @@
                             <a href="{{ route('cars.index') }}" class="text-sm text-green-600 hover:text-green-700">{{ __('View All') }}</a>
                         </div>
 
-                        @php
-                            $recentCars = \App\Models\Car::latest()->take(5)->get();
-                        @endphp
+                        <!-- Recent cars are loaded from the controller -->
 
                         @if($recentCars->count() > 0)
                             <div class="overflow-x-auto">
@@ -174,6 +172,7 @@
                                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Phase') }}</th>
                                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Purchase Price') }}</th>
                                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Date') }}</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Actions') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody class="bg-white divide-y divide-gray-200">
@@ -183,29 +182,72 @@
                                                     <div class="flex items-center">
                                                         <div>
                                                             <div class="text-sm font-medium text-gray-900">
-                                                                <a href="{{ route('cars.show', $car) }}" class="hover:text-green-600">
+                                                                @if($car->id)
+                                                                <a href="{{ route('cars.show', ['car' => $car->id]) }}" class="hover:text-green-600">
                                                                     {{ $car->year }} {{ $car->make }} {{ $car->model }}
                                                                 </a>
+                                                                @else
+                                                                <span>{{ $car->year }} {{ $car->make }} {{ $car->model }}</span>
+                                                                @endif
                                                             </div>
-                                                            <div class="text-sm text-gray-500">{{ $car->vin ?? 'No VIN' }}</div>
+                                                            @if(Auth::user()->role === 'admin' && $car->creator)
+                                                            <div class="text-xs text-gray-400 mt-1">
+                                                                Created by: <span class="font-medium">{{ $car->creator->name }}</span>
+                                                            </div>
+                                                            @endif
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap">
+                                                    @if(isset($car->current_phase))
                                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                                                         @if($car->current_phase == 'bidding') bg-blue-100 text-blue-800
                                                         @elseif($car->current_phase == 'fixing') bg-yellow-100 text-yellow-800
                                                         @elseif($car->current_phase == 'dealership') bg-green-100 text-green-800
                                                         @elseif($car->current_phase == 'sold') bg-purple-100 text-purple-800
+                                                        @else bg-gray-100 text-gray-800
                                                         @endif">
-                                                        {{ ucfirst($car->current_phase) }}
+                                                        {{ ucfirst($car->current_phase ?? 'Unknown') }}
                                                     </span>
+                                                    @else
+                                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                                        N/A
+                                                    </span>
+                                                    @endif
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    @if(isset($car->purchase_price))
                                                     R {{ number_format($car->purchase_price, 2) }}
+                                                    @else
+                                                    N/A
+                                                    @endif
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {{ $car->purchase_date->format('d M Y') }}
+                                                    {{ $car->purchase_date ? $car->purchase_date->format('d M Y') : 'N/A' }}
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                    <div class="flex space-x-2">
+                                                        @if($car->id)
+                                                        <a href="{{ route('cars.show', ['car' => $car->id]) }}" class="text-blue-600 hover:text-blue-900" title="View">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                            </svg>
+                                                        </a>
+                                                        <a href="{{ route('cars.edit', ['car' => $car->id]) }}" class="text-indigo-600 hover:text-indigo-900" title="Edit">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                            </svg>
+                                                        </a>
+                                                        @else
+                                                        <span class="text-gray-400">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                            </svg>
+                                                        </span>
+                                                        @endif
+                                                    </div>
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -260,6 +302,24 @@
                             </div>
                             <span class="text-sm font-medium text-gray-900">{{ __('Manage Suppliers') }}</span>
                         </a>
+                        @if(Auth::user()->role === 'admin')
+                        <a href="{{ route('users.index') }}" class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                            <div class="p-3 bg-indigo-100 rounded-full mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                </svg>
+                            </div>
+                            <span class="text-sm font-medium text-gray-900">{{ __('Manage Users') }}</span>
+                        </a>
+                        <a href="{{ route('audit-logs.index') }}" class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                            <div class="p-3 bg-red-100 rounded-full mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                                </svg>
+                            </div>
+                            <span class="text-sm font-medium text-gray-900">{{ __('Audit Logs') }}</span>
+                        </a>
+                        @endif
                         <a href="{{ route('profile.edit') }}" class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                             <div class="p-3 bg-purple-100 rounded-full mb-3">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -271,6 +331,56 @@
                     </div>
                 </div>
             </div>
+
+            @if(Auth::user()->role === 'admin' && $userStats)
+            <!-- Admin Stats -->
+            <div class="mt-6 bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('User Statistics') }}</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600">{{ __('Total Users') }}</p>
+                                    <p class="text-3xl font-bold text-gray-900">{{ $userStats['total'] }}</p>
+                                </div>
+                                <div class="p-3 bg-blue-100 rounded-full">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600">{{ __('Admin Users') }}</p>
+                                    <p class="text-3xl font-bold text-gray-900">{{ $userStats['admins'] }}</p>
+                                </div>
+                                <div class="p-3 bg-purple-100 rounded-full">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600">{{ __('Regular Users') }}</p>
+                                    <p class="text-3xl font-bold text-gray-900">{{ $userStats['users'] }}</p>
+                                </div>
+                                <div class="p-3 bg-green-100 rounded-full">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
         </div>
     </div>
 </x-app-layout>

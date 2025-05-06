@@ -75,6 +75,8 @@
             <!-- Cars List -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
+                    <x-flash-message />
+
                     @if($cars->count() > 0)
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
@@ -84,6 +86,9 @@
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Phase') }}</th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Purchase Price') }}</th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Purchase Date') }}</th>
+                                        @if(Auth::user()->role === 'admin')
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Created By') }}</th>
+                                        @endif
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
@@ -116,14 +121,27 @@
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                 {{ $car->purchase_date->format('d M Y') }}
                                             </td>
+                                            @if(Auth::user()->role === 'admin')
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                @if($car->creator)
+                                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                                        {{ $car->creator->name }}
+                                                    </span>
+                                                @else
+                                                    <span class="text-gray-400">{{ __('System') }}</span>
+                                                @endif
+                                            </td>
+                                            @endif
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <div class="flex space-x-2">
                                                     <a href="{{ route('cars.show', $car) }}" class="text-green-600 hover:text-green-900">{{ __('View') }}</a>
                                                     <a href="{{ route('cars.edit', $car) }}" class="text-blue-600 hover:text-blue-900">{{ __('Edit') }}</a>
-                                                    <form action="{{ route('cars.destroy', $car) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this car?');">
+                                                    <form action="{{ route('cars.destroy', $car) }}" method="POST" class="inline" onsubmit="return confirm('{{ Auth::user()->role === 'admin' ? 'Are you sure you want to permanently delete this car?' : 'Are you sure you want to mark this car as inactive?' }}');">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="text-red-600 hover:text-red-900">{{ __('Delete') }}</button>
+                                                        <button type="submit" class="text-red-600 hover:text-red-900">
+                                                            {{ Auth::user()->role === 'admin' ? __('Delete') : __('Deactivate') }}
+                                                        </button>
                                                     </form>
                                                 </div>
                                             </td>

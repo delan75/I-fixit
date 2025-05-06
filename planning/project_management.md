@@ -34,53 +34,11 @@ Tasks that have been identified but not yet scheduled for implementation.
 ### 📋 To Do
 Tasks that are scheduled for implementation in the current or upcoming sprint.
 
-#### Sprint 1: Project Setup
-- [x] **T-002**: Set up GitHub repository (Priority: High, Effort: 1, Assignee: AI Assistant)
-
-#### Sprint 2: Database and Authentication
-- [x] **T-008**: Create database migrations for users table with roles (Priority: High, Effort: 2, Assignee: AI Assistant)
-- [x] **T-009**: Create database migrations for cars table (Priority: High, Effort: 3, Assignee: AI Assistant)
-- [x] **T-010**: Create database migrations for car images table (Priority: High, Effort: 2, Assignee: AI Assistant)
-- [x] **T-011**: Create database migrations for damaged parts table (Priority: High, Effort: 2, Assignee: AI Assistant)
-- [x] **T-012**: Create database migrations for parts table (Priority: High, Effort: 2, Assignee: AI Assistant)
-- [x] **T-013**: Create database migrations for suppliers table (Priority: High, Effort: 2, Assignee: AI Assistant)
-- [x] **T-014**: Create database migrations for labor table (Priority: High, Effort: 2, Assignee: AI Assistant)
-- [x] **T-015**: Create database migrations for painting table (Priority: High, Effort: 2, Assignee: AI Assistant)
-- [x] **T-016**: Create database migrations for sales table (Priority: High, Effort: 2, Assignee: AI Assistant)
-- [x] **T-017**: Create database migrations for documents table (Priority: High, Effort: 2, Assignee: AI Assistant)
-- [x] **T-018**: Create database migrations for notifications table (Priority: High, Effort: 2, Assignee: AI Assistant)
-- [x] **T-019**: Create database migrations for activity log table (Priority: Medium, Effort: 2, Assignee: AI Assistant)
-- [x] **T-020**: Implement user authentication with 2FA (Priority: High, Effort: 3, Assignee: AI Assistant)
-- [x] **T-021**: Create user management CRUD operations (Priority: High, Effort: 3, Assignee: AI Assistant)
-
-#### Sprint 3: Car Management
-- [x] **T-022**: Create car model and relationships (Priority: High, Effort: 3, Assignee: AI Assistant)
-- [x] **T-023**: Implement car listing page with filters (Priority: High, Effort: 4, Assignee: AI Assistant)
-- [x] **T-024**: Create car details page (Priority: High, Effort: 4, Assignee: AI Assistant)
-- [x] **T-025**: Implement car registration form (Priority: High, Effort: 3, Assignee: AI Assistant)
-- [x] **T-026**: Develop damage assessment workflow (Priority: High, Effort: 5, Assignee: AI Assistant)
-- [x] **T-027**: Implement car image upload with thumbnails (Priority: High, Effort: 3, Assignee: AI Assistant)
-- [x] **T-028**: Create car phase transition functionality (Priority: High, Effort: 4, Assignee: AI Assistant)
-- [x] **T-029**: Implement car edit functionality (Priority: High, Effort: 3, Assignee: AI Assistant)
-- [x] **T-030**: Create car deletion with soft deletes (Priority: Medium, Effort: 2, Assignee: AI Assistant)
-
-#### Sprint 4: Parts and Repairs
-- [x] **T-031**: Create parts model and relationships (Priority: High, Effort: 3, Assignee: AI Assistant)
-- [x] **T-032**: Implement parts management interface (Priority: High, Effort: 4, Assignee: AI Assistant)
-- [x] **T-033**: Create suppliers model and management (Priority: High, Effort: 3, Assignee: AI Assistant)
-- [x] **T-034**: Implement labor tracking functionality (Priority: High, Effort: 3, Assignee: AI Assistant)
-- [x] **T-035**: Create painting cost tracking (Priority: High, Effort: 3, Assignee: AI Assistant)
-- [x] **T-036**: Implement repair phase dashboard (Priority: High, Effort: 4, Assignee: AI Assistant)
-- [x] **T-037**: Create repair completion workflow (Priority: High, Effort: 3, Assignee: AI Assistant)
-- [x] **T-038**: Implement damaged parts tracking (Priority: High, Effort: 4, Assignee: AI Assistant)
-
 #### Sprint 5: Sales and Dealership
 - [ ] **T-039**: Create sales model and relationships (Priority: High, Effort: 3, Assignee: TBD)
 - [ ] **T-040**: Implement dealership phase dashboard (Priority: High, Effort: 4, Assignee: TBD)
 - [ ] **T-041**: Create sales recording interface (Priority: High, Effort: 3, Assignee: TBD)
-- [ ] **T-042**: Implement profit calculation (Priority: High, Effort: 3, Assignee: TBD)
 - [ ] **T-043**: Create dealership discount functionality (Priority: Medium, Effort: 2, Assignee: TBD)
-- [ ] **T-044**: Implement days-at-dealership tracking (Priority: Medium, Effort: 2, Assignee: TBD)
 - [ ] **T-045**: Create sales completion workflow (Priority: High, Effort: 3, Assignee: TBD)
 
 #### Sprint 6: Reporting and Dashboard
@@ -141,6 +99,7 @@ Tasks that have been completed and are awaiting review/approval.
 ### ✅ Done
 Tasks that have been completed, reviewed, and approved.
 
+#### Sprint 1: Project Setup
 - [x] **D-001**: Create business rules document (Priority: High, Effort: 3, Assignee: AI Assistant)
 - [x] **D-002**: Create project plan document (Priority: High, Effort: 3, Assignee: AI Assistant)
 - [x] **D-003**: Create database design document (Priority: High, Effort: 4, Assignee: AI Assistant)
@@ -158,6 +117,52 @@ Tasks that have been completed, reviewed, and approved.
 - [x] **D-014**: Create base layout template (Priority: High, Effort: 3, Assignee: AI Assistant)
 - [x] **D-015**: Implement role-based middleware (Priority: High, Effort: 3, Assignee: AI Assistant)
 - [x] **D-016**: Set up GitHub repository (Priority: High, Effort: 1, Assignee: AI Assistant)
+
+#### Sprint 2: Database and Authentication
+- [x] **D-017**: Create database migrations for users table with roles (Priority: High, Effort: 2, Assignee: AI Assistant)
+- [x] **D-018**: Create database migrations for cars table (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **D-019**: Create database migrations for car images table (Priority: High, Effort: 2, Assignee: AI Assistant)
+- [x] **D-020**: Create database migrations for damaged parts table (Priority: High, Effort: 2, Assignee: AI Assistant)
+- [x] **D-021**: Create database migrations for parts table (Priority: High, Effort: 2, Assignee: AI Assistant)
+- [x] **D-022**: Create database migrations for suppliers table (Priority: High, Effort: 2, Assignee: AI Assistant)
+- [x] **D-023**: Create database migrations for labor table (Priority: High, Effort: 2, Assignee: AI Assistant)
+- [x] **D-024**: Create database migrations for painting table (Priority: High, Effort: 2, Assignee: AI Assistant)
+- [x] **D-025**: Create database migrations for sales table (Priority: High, Effort: 2, Assignee: AI Assistant)
+- [x] **D-026**: Create database migrations for documents table (Priority: High, Effort: 2, Assignee: AI Assistant)
+- [x] **D-027**: Create database migrations for notifications table (Priority: High, Effort: 2, Assignee: AI Assistant)
+- [x] **D-028**: Create database migrations for activity log table (Priority: Medium, Effort: 2, Assignee: AI Assistant)
+- [x] **D-029**: Implement user authentication with 2FA (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **D-030**: Create user management CRUD operations (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **D-031**: Implement multi-step form with save/next/back functionality (Priority: High, Effort: 4, Assignee: AI Assistant)
+
+#### Sprint 3: Car Management
+- [x] **D-032**: Create car model and relationships (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **D-033**: Implement car listing page with filters (Priority: High, Effort: 4, Assignee: AI Assistant)
+- [x] **D-034**: Create car details page (Priority: High, Effort: 4, Assignee: AI Assistant)
+- [x] **D-035**: Implement car registration form (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **D-036**: Develop damage assessment workflow (Priority: High, Effort: 5, Assignee: AI Assistant)
+- [x] **D-037**: Implement car image upload with thumbnails (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **D-038**: Create car phase transition functionality (Priority: High, Effort: 4, Assignee: AI Assistant)
+- [x] **D-039**: Implement car edit functionality (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **D-040**: Create car deletion with soft deletes (Priority: Medium, Effort: 2, Assignee: AI Assistant)
+- [x] **D-041**: Implement vehicle code selection (Code 2/3/4) (Priority: High, Effort: 2, Assignee: AI Assistant)
+
+#### Sprint 4: Parts and Repairs
+- [x] **D-042**: Create parts model and relationships (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **D-043**: Implement parts management interface (Priority: High, Effort: 4, Assignee: AI Assistant)
+- [x] **D-044**: Create suppliers model and management (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **D-045**: Implement labor tracking functionality (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **D-046**: Create painting cost tracking (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **D-047**: Implement repair phase dashboard (Priority: High, Effort: 4, Assignee: AI Assistant)
+- [x] **D-048**: Create repair completion workflow (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **D-049**: Implement damaged parts tracking (Priority: High, Effort: 4, Assignee: AI Assistant)
+
+#### Sprint 5: Partial Implementation
+- [x] **D-050**: Implement profit calculation (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **D-051**: Implement days-at-dealership tracking (Priority: Medium, Effort: 2, Assignee: AI Assistant)
+- [x] **D-052**: Create main dashboard with recent cars (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **D-053**: Implement user profile management (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **D-054**: Add gender styling to user management (Priority: Low, Effort: 1, Assignee: AI Assistant)
 
 ## Sprint Planning
 
@@ -191,7 +196,7 @@ Tasks that have been completed, reviewed, and approved.
 - Implemented damaged parts tracking with descriptions
 - Created functional cost sections for parts, labor, and painting
 
-### Current Sprint: Car Management and Parts Tracking
+### Previous Sprint: Car Management and Parts Tracking
 **Goal**: Implement car management functionality and parts tracking
 **Start Date**: June 2, 2025
 **End Date**: June 15, 2025
@@ -207,6 +212,21 @@ Tasks that have been completed, reviewed, and approved.
 - Created car phase transition functionality
 - Implemented parts, labor, and painting cost tracking
 - Added damaged parts tracking with repair status
+
+### Current Sprint: Dashboard Enhancements and Bug Fixes
+**Goal**: Enhance dashboard functionality and fix identified bugs
+**Start Date**: June 16, 2025
+**End Date**: June 29, 2025
+**Status**: In Progress
+**Tasks**: Various enhancements and bug fixes
+**Achievements so far**:
+- Fixed SQL error in dashboard query for recent cars
+- Implemented proper styling for gender field in user management
+- Added updated_by column to users table
+- Enhanced dashboard with recent cars display
+- Fixed multi-step car form navigation
+- Improved vehicle code selection implementation
+- Enhanced damaged parts tracking with descriptions
 
 ## Milestone Tracking
 
@@ -232,10 +252,11 @@ Tasks that have been completed, reviewed, and approved.
 **Progress**: 100% (8/8 tasks completed)
 
 ### Milestone 4: Sales and Reporting
-**Target Date**: [TBD]
-**Status**: Not Started
+**Target Date**: July 15, 2025
+**Status**: Partially Implemented
 **Tasks**: T-039 through T-053
 **Description**: Implement sales recording, profit calculation, and reporting features
+**Progress**: 20% (Some features like profit calculation and dashboard with recent cars already implemented)
 
 ### Milestone 5: Advanced Features
 **Target Date**: [TBD]

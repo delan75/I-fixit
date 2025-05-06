@@ -33,7 +33,7 @@
 
                                 <div>
                                     <x-input-label for="branch_name" :value="__('Branch Name (Optional)')" />
-                                    <x-text-input id="branch_name" class="block mt-1 w-full" type="text" name="branch_name" :value="old('branch_name')" placeholder="e.g. Downtown, North Side, etc." />
+                                    <x-text-input id="branch_name" class="block mt-1 w-full" type="text" name="branch_name" :value="old('branch_name')" placeholder="e.g. Boksburg, Bramley, etc." />
                                     <x-input-error :messages="$errors->get('branch_name')" class="mt-2" />
                                 </div>
 
