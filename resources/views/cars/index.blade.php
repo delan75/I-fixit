@@ -17,56 +17,73 @@
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <!-- Filter Toggle Button -->
+            <div class="flex justify-end items-center mb-6">
+                <button id="filter-toggle" class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                    </svg>
+                    {{ __('Filter & Search') }}
+                </button>
+            </div>
+
             <!-- Filters -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+            <div id="filter-section" class="hidden bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6 bg-white border-b border-gray-200">
-                    <form action="{{ route('cars.index') }}" method="GET" class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div>
-                                <label for="phase" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Phase') }}</label>
-                                <select id="phase" name="phase" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
-                                    <option value="">{{ __('All Phases') }}</option>
-                                    <option value="bidding" {{ request('phase') == 'bidding' ? 'selected' : '' }}>{{ __('Bidding') }}</option>
-                                    <option value="fixing" {{ request('phase') == 'fixing' ? 'selected' : '' }}>{{ __('Fixing') }}</option>
-                                    <option value="dealership" {{ request('phase') == 'dealership' ? 'selected' : '' }}>{{ __('At Dealership') }}</option>
-                                    <option value="sold" {{ request('phase') == 'sold' ? 'selected' : '' }}>{{ __('Sold') }}</option>
-                                </select>
+                    <form action="{{ route('cars.index') }}" method="GET">
+                        <div class="flex flex-col lg:flex-row lg:items-end lg:space-x-4 space-y-4 lg:space-y-0">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 flex-grow">
+                                <div>
+                                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Search') }}</label>
+                                    <input type="text" id="search" name="search" value="{{ request('search') }}" placeholder="Search..."
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                </div>
+                                <div>
+                                    <label for="phase" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Phase') }}</label>
+                                    <select id="phase" name="phase" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                        <option value="">{{ __('All Phases') }}</option>
+                                        <option value="bidding" {{ request('phase') == 'bidding' ? 'selected' : '' }}>{{ __('Bidding') }}</option>
+                                        <option value="fixing" {{ request('phase') == 'fixing' ? 'selected' : '' }}>{{ __('Fixing') }}</option>
+                                        <option value="dealership" {{ request('phase') == 'dealership' ? 'selected' : '' }}>{{ __('At Dealership') }}</option>
+                                        <option value="sold" {{ request('phase') == 'sold' ? 'selected' : '' }}>{{ __('Sold') }}</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="make" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Make') }}</label>
+                                    <select id="make" name="make" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                        <option value="">{{ __('All Makes') }}</option>
+                                        @foreach($makes as $carMake)
+                                            <option value="{{ $carMake }}" {{ request('make') == $carMake ? 'selected' : '' }}>{{ $carMake }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="model" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Model') }}</label>
+                                    <select id="model" name="model" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                        <option value="">{{ __('All Models') }}</option>
+                                        @foreach($models as $carModel)
+                                            <option value="{{ $carModel }}" {{ request('model') == $carModel ? 'selected' : '' }}>{{ $carModel }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="year" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Year') }}</label>
+                                    <select id="year" name="year" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                        <option value="">{{ __('All Years') }}</option>
+                                        @foreach($years as $carYear)
+                                            <option value="{{ $carYear }}" {{ request('year') == $carYear ? 'selected' : '' }}>{{ $carYear }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
-                            <div>
-                                <label for="make" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Make') }}</label>
-                                <select id="make" name="make" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
-                                    <option value="">{{ __('All Makes') }}</option>
-                                    @foreach($makes as $carMake)
-                                        <option value="{{ $carMake }}" {{ request('make') == $carMake ? 'selected' : '' }}>{{ $carMake }}</option>
-                                    @endforeach
-                                </select>
+                            <div class="flex-shrink-0">
+                                <button type="submit" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                    </svg>
+                                    {{ __('Apply Filters') }}
+                                </button>
                             </div>
-                            <div>
-                                <label for="model" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Model') }}</label>
-                                <select id="model" name="model" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
-                                    <option value="">{{ __('All Models') }}</option>
-                                    @foreach($models as $carModel)
-                                        <option value="{{ $carModel }}" {{ request('model') == $carModel ? 'selected' : '' }}>{{ $carModel }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label for="year" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Year') }}</label>
-                                <select id="year" name="year" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
-                                    <option value="">{{ __('All Years') }}</option>
-                                    @foreach($years as $carYear)
-                                        <option value="{{ $carYear }}" {{ request('year') == $carYear ? 'selected' : '' }}>{{ $carYear }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="flex justify-end">
-                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                                </svg>
-                                {{ __('Filter') }}
-                            </button>
                         </div>
                     </form>
                 </div>
@@ -171,4 +188,14 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterToggle = document.getElementById('filter-toggle');
+            const filterSection = document.getElementById('filter-section');
+
+            filterToggle.addEventListener('click', function() {
+                filterSection.classList.toggle('hidden');
+            });
+        });
+    </script>
 </x-app-layout>

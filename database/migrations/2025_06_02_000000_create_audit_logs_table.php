@@ -13,16 +13,17 @@ return new class extends Migration
     {
         Schema::create('audit_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+            $table->uuid('user_id')->nullable();
+            $table->foreign('user_id')->references('id')->on('users')->nullOnDelete();
             $table->string('action');
             $table->string('model_type');
-            $table->unsignedBigInteger('model_id')->nullable();
+            $table->string('model_id', 36)->nullable(); // Changed to string to support UUIDs
             $table->text('old_values')->nullable();
             $table->text('new_values')->nullable();
             $table->string('ip_address')->nullable();
             $table->string('user_agent')->nullable();
             $table->timestamps();
-            
+
             // Add indexes for better performance
             $table->index(['model_type', 'model_id']);
             $table->index('action');

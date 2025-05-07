@@ -17,20 +17,49 @@
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Search -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+            <!-- Filter Toggle Button -->
+            <div class="flex justify-end items-center mb-6">
+                <button id="filter-toggle" class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                    </svg>
+                    {{ __('Filter & Search') }}
+                </button>
+            </div>
+
+            <!-- Filters and Search -->
+            <div id="filter-section" class="hidden bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6 bg-white border-b border-gray-200">
-                    <form action="{{ route('suppliers.index') }}" method="GET" class="flex items-center">
-                        <div class="flex-1 mr-4">
-                            <x-input-label for="search" :value="__('Search Suppliers')" class="sr-only" />
-                            <x-text-input id="search" class="block w-full" type="text" name="search" :value="request('search')" placeholder="Search by name, branch, contact person, phone or email..." />
+                    <form action="{{ route('suppliers.index') }}" method="GET">
+                        <div class="flex flex-col lg:flex-row lg:items-end lg:space-x-4 space-y-4 lg:space-y-0">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 flex-grow">
+                                <!-- Search Bar -->
+                                <div>
+                                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Search') }}</label>
+                                    <input type="text" id="search" name="search" value="{{ request('search') }}" placeholder="Search by name, branch, contact person, phone or email..."
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                </div>
+
+                                <!-- Created By Filter -->
+                                <div>
+                                    <label for="created_by" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Created By') }}</label>
+                                    <select id="created_by" name="created_by" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                        <option value="">{{ __('All Creators') }}</option>
+                                        @foreach($creators as $creator)
+                                            <option value="{{ $creator->id }}" {{ request('created_by') == $creator->id ? 'selected' : '' }}>{{ $creator->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <button type="submit" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                    </svg>
+                                    {{ __('Apply Filters') }}
+                                </button>
+                            </div>
                         </div>
-                        <x-primary-button>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                            {{ __('Search') }}
-                        </x-primary-button>
                     </form>
                 </div>
             </div>
@@ -49,6 +78,7 @@
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Branch') }}</th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Contact Person') }}</th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Phone') }}</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Email') }}</th>
                                         @if(Auth::user()->hasRole('admin'))
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Created By') }}</th>
                                         @endif
@@ -130,4 +160,15 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterToggle = document.getElementById('filter-toggle');
+            const filterSection = document.getElementById('filter-section');
+
+            filterToggle.addEventListener('click', function() {
+                filterSection.classList.toggle('hidden');
+            });
+        });
+    </script>
 </x-app-layout>

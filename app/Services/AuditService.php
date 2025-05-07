@@ -47,10 +47,10 @@ class AuditService
      * Log a soft delete action.
      *
      * @param Model $model The model that was soft deleted
-     * @param int|null $userId The ID of the user performing the action
+     * @param string|null $userId The ID of the user performing the action
      * @return AuditLog
      */
-    public static function logSoftDeleted(Model $model, ?int $userId = null): AuditLog
+    public static function logSoftDeleted(Model $model, ?string $userId = null): AuditLog
     {
         return self::log('soft_deleted', $model, $model->getAttributes(), null, $userId);
     }
@@ -59,10 +59,10 @@ class AuditService
      * Log a restore action.
      *
      * @param Model $model The model that was restored
-     * @param int|null $userId The ID of the user performing the action
+     * @param string|null $userId The ID of the user performing the action
      * @return AuditLog
      */
-    public static function logRestored(Model $model, ?int $userId = null): AuditLog
+    public static function logRestored(Model $model, ?string $userId = null): AuditLog
     {
         return self::log('restored', $model, null, $model->getAttributes(), $userId);
     }
@@ -96,10 +96,10 @@ class AuditService
      * @param Model $model The model affected
      * @param array|null $oldValues The old values (if applicable)
      * @param array|null $newValues The new values (if applicable)
-     * @param int|null $userId The ID of the user performing the action (defaults to current authenticated user)
+     * @param string|null $userId The ID of the user performing the action (defaults to current authenticated user)
      * @return AuditLog
      */
-    public static function log(string $action, Model $model, ?array $oldValues = null, ?array $newValues = null, ?int $userId = null): AuditLog
+    public static function log(string $action, Model $model, ?array $oldValues = null, ?array $newValues = null, ?string $userId = null): AuditLog
     {
         // Filter out sensitive data
         if ($oldValues) {

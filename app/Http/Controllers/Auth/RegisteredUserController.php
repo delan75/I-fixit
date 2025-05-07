@@ -33,10 +33,26 @@ class RegisteredUserController extends Controller
         $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'phone' => ['required', 'string', 'max:20', 'unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255'],
+            'phone' => ['required', 'string', 'max:20'],
             'gender' => ['nullable', 'string', 'in:male,female,other'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ]);
+
+        // Check for existing (even inactive) user with same email or phone
+        $inactiveUser = User::where(function($q) use ($request) {
+            $q->where('email', $request->email)->orWhere('phone', $request->phone);
+        })->where('status', 'inactive')->first();
+        if ($inactiveUser) {
+            return back()->withInput()->withErrors([
+                'email' => 'Invalid email or phone number.',
+                'phone' => 'Invalid email or phone number.'
+            ]);
+        }
+        // Check for active user (for unique validation)
+        $request->validate([
+            'email' => 'unique:users,email',
+            'phone' => 'unique:users,phone',
         ]);
 
         // Only collect safe user input

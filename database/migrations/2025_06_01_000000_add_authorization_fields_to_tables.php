@@ -13,56 +13,70 @@ return new class extends Migration
     {
         // Add created_by and updated_by to cars table
         Schema::table('cars', function (Blueprint $table) {
-            $table->foreignId('created_by')->nullable()->after('user_id')->constrained('users')->nullOnDelete();
-            $table->foreignId('updated_by')->nullable()->after('created_by')->constrained('users')->nullOnDelete();
+            $table->uuid('created_by')->nullable()->after('user_id');
+            $table->foreign('created_by')->references('id')->on('users')->nullOnDelete();
+            $table->uuid('updated_by')->nullable()->after('created_by');
+            $table->foreign('updated_by')->references('id')->on('users')->nullOnDelete();
             $table->softDeletes(); // Adds deleted_at column
             $table->string('status')->default('active')->after('form_step');
         });
 
         // Add created_by and updated_by to damaged_parts table
         Schema::table('damaged_parts', function (Blueprint $table) {
-            $table->foreignId('created_by')->nullable()->after('car_id')->constrained('users')->nullOnDelete();
-            $table->foreignId('updated_by')->nullable()->after('created_by')->constrained('users')->nullOnDelete();
+            $table->uuid('created_by')->nullable()->after('car_id');
+            $table->foreign('created_by')->references('id')->on('users')->nullOnDelete();
+            $table->uuid('updated_by')->nullable()->after('created_by');
+            $table->foreign('updated_by')->references('id')->on('users')->nullOnDelete();
             $table->softDeletes(); // Adds deleted_at column
             $table->string('status')->default('active')->after('is_repaired');
         });
 
         // Add created_by and updated_by to parts table
         Schema::table('parts', function (Blueprint $table) {
-            $table->foreignId('created_by')->nullable()->after('car_id')->constrained('users')->nullOnDelete();
-            $table->foreignId('updated_by')->nullable()->after('created_by')->constrained('users')->nullOnDelete();
+            $table->uuid('created_by')->nullable()->after('car_id');
+            $table->foreign('created_by')->references('id')->on('users')->nullOnDelete();
+            $table->uuid('updated_by')->nullable()->after('created_by');
+            $table->foreign('updated_by')->references('id')->on('users')->nullOnDelete();
             $table->softDeletes(); // Adds deleted_at column
             $table->string('status')->default('active')->after('supplier_id');
         });
 
         // Add created_by and updated_by to labor table
         Schema::table('labor', function (Blueprint $table) {
-            $table->foreignId('created_by')->nullable()->after('car_id')->constrained('users')->nullOnDelete();
-            $table->foreignId('updated_by')->nullable()->after('created_by')->constrained('users')->nullOnDelete();
+            $table->uuid('created_by')->nullable()->after('car_id');
+            $table->foreign('created_by')->references('id')->on('users')->nullOnDelete();
+            $table->uuid('updated_by')->nullable()->after('created_by');
+            $table->foreign('updated_by')->references('id')->on('users')->nullOnDelete();
             $table->softDeletes(); // Adds deleted_at column
             $table->string('status')->default('active')->after('completion_date');
         });
 
         // Add created_by and updated_by to painting table
         Schema::table('painting', function (Blueprint $table) {
-            $table->foreignId('created_by')->nullable()->after('car_id')->constrained('users')->nullOnDelete();
-            $table->foreignId('updated_by')->nullable()->after('created_by')->constrained('users')->nullOnDelete();
+            $table->uuid('created_by')->nullable()->after('car_id');
+            $table->foreign('created_by')->references('id')->on('users')->nullOnDelete();
+            $table->uuid('updated_by')->nullable()->after('created_by');
+            $table->foreign('updated_by')->references('id')->on('users')->nullOnDelete();
             $table->softDeletes(); // Adds deleted_at column
             $table->string('status')->default('active')->after('completion_date');
         });
 
         // Add created_by and updated_by to sales table
         Schema::table('sales', function (Blueprint $table) {
-            $table->foreignId('created_by')->nullable()->after('car_id')->constrained('users')->nullOnDelete();
-            $table->foreignId('updated_by')->nullable()->after('created_by')->constrained('users')->nullOnDelete();
+            $table->uuid('created_by')->nullable()->after('car_id');
+            $table->foreign('created_by')->references('id')->on('users')->nullOnDelete();
+            $table->uuid('updated_by')->nullable()->after('created_by');
+            $table->foreign('updated_by')->references('id')->on('users')->nullOnDelete();
             $table->softDeletes(); // Adds deleted_at column
             $table->string('status')->default('active')->after('notes');
         });
 
         // Add created_by and updated_by to suppliers table
         Schema::table('suppliers', function (Blueprint $table) {
-            $table->foreignId('created_by')->nullable()->after('id')->constrained('users')->nullOnDelete();
-            $table->foreignId('updated_by')->nullable()->after('created_by')->constrained('users')->nullOnDelete();
+            $table->uuid('created_by')->nullable()->after('id');
+            $table->foreign('created_by')->references('id')->on('users')->nullOnDelete();
+            $table->uuid('updated_by')->nullable()->after('created_by');
+            $table->foreign('updated_by')->references('id')->on('users')->nullOnDelete();
             $table->softDeletes(); // Adds deleted_at column
             $table->string('status')->default('active')->after('website');
         });

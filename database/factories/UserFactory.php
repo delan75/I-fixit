@@ -23,9 +23,21 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $name = fake()->name();
+        $parts = explode(' ', $name, 2);
+        $firstName = $parts[0];
+        $lastName = $parts[1] ?? '';
+
         return [
-            'name' => fake()->name(),
+            'id' => Str::uuid(), // Generate UUID for id
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'name' => $name,
             'email' => fake()->unique()->safeEmail(),
+            'phone' => fake()->phoneNumber(),
+            'gender' => fake()->randomElement(['male', 'female', 'other']),
+            'role' => 'user',
+            'status' => 'active',
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
@@ -39,6 +51,16 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the user is an admin.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'admin',
         ]);
     }
 }

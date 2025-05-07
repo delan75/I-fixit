@@ -19,15 +19,41 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         // Check if user has permission to view users
         Gate::authorize('view-users');
 
-        // Get all users (both active and inactive)
-        $users = User::orderBy('status') // Order by status to group active and inactive users
-                     ->orderBy('name')
-                     ->paginate(10);
+        // Start with a base query
+        $query = User::query();
+
+        // Apply filters if provided
+        if ($request->filled('role')) {
+            $query->where('role', $request->input('role'));
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        if ($request->filled('gender')) {
+            $query->where('gender', $request->input('gender'));
+        }
+
+        // Apply search if provided
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                  ->orWhere('email', 'like', "%$search%")
+                  ->orWhere('phone', 'like', "%$search%");
+            });
+        }
+
+        // Order by status and name, then paginate
+        $users = $query->orderBy('status')
+                       ->orderBy('name')
+                       ->paginate(10);
 
         return view('users.index', compact('users'));
     }

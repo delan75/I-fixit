@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Supplier;
+use App\Models\User;
 use App\Services\AuditService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,13 +18,14 @@ class SupplierController extends Controller
     {
         // Get query parameters for filtering
         $search = $request->query('search');
+        $createdBy = $request->query('created_by');
 
         // Start with a base query
         $query = Supplier::query();
 
         // Apply authorization filter - admin sees all, users see only their own
         $user = Auth::user();
-        if (!$user->hasRole('admin')) {
+        if ($user->role !== 'admin') {
             $query->where('created_by', $user->id);
         }
 
@@ -41,10 +43,18 @@ class SupplierController extends Controller
             });
         }
 
+        // Apply created_by filter if provided
+        if ($createdBy) {
+            $query->where('created_by', $createdBy);
+        }
+
         // Get the suppliers with pagination
         $suppliers = $query->orderBy('name')->paginate(10);
 
-        return view('suppliers.index', compact('suppliers', 'search'));
+        // Get the list of creators for the filter dropdown
+        $creators = User::select('id', 'name')->distinct()->get();
+
+        return view('suppliers.index', compact('suppliers', 'search', 'creators'));
     }
 
     /**
@@ -152,7 +162,7 @@ class SupplierController extends Controller
         }
 
         // Check if user has permission to delete this supplier
-        if (Auth::user()->hasRole('admin')) {
+        if (Auth::user()->role === 'admin') {
             // Admin can permanently delete
             $this->authorize('delete', $supplier);
             $supplier->delete();
@@ -163,7 +173,7 @@ class SupplierController extends Controller
             $supplier->status = 'inactive';
             $supplier->updated_by = Auth::id();
             $supplier->save();
-            $message = 'Supplier marked as inactive successfully.';
+            $message = 'Supplier deleted successfully.';
         }
 
         return redirect()->route('suppliers.index')

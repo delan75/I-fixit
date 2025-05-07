@@ -431,7 +431,7 @@ class CarController extends Controller
             $car->status = 'inactive';
             $car->updated_by = Auth::id();
             $car->save();
-            $message = 'Car marked as inactive successfully.';
+            $message = 'Car deleted successfully.';
         }
 
         return redirect()->route('cars.index')
