@@ -160,7 +160,9 @@ The project now includes a GitHub Actions workflow for automated deployments:
          - name: Update index.php
            run: |
              # Ensure index.php points to i-fixit directory
-             sed -i 's|__DIR__.\'/\.\./|__DIR__.\'/i-fixit/|g' deploy/index.php
+             sed -i "s|__DIR__.'/../|__DIR__.'/i-fixit/|g" deploy/index.php
+             # Verify the change was made
+             cat deploy/index.php
 
          - name: Ensure Storage Directory Permissions
            run: |
@@ -305,6 +307,7 @@ MAIL_FROM_NAME="${APP_NAME}"
    - **"Permission denied"**: Check that the FTP user has write permissions to the target directory
    - **"File not found"**: Ensure all paths in the deployment script are correct
    - **"Index.php not found"**: Verify that the public directory contents are being copied correctly
+   - **"Unexpected EOF while looking for matching"**: Check for syntax errors in shell commands, especially in sed commands with complex quotes and escape characters
 
 ### Recovery Procedures
 

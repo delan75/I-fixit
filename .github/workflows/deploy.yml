@@ -59,7 +59,9 @@ jobs:
       - name: Update index.php
         run: |
           # Ensure index.php points to i-fixit directory
-          sed -i 's|__DIR__.\'/\.\./|__DIR__.\'/i-fixit/|g' deploy/index.php
+          sed -i "s|__DIR__.'/../|__DIR__.'/i-fixit/|g" deploy/index.php
+          # Verify the change was made
+          cat deploy/index.php
 
       - name: Ensure Storage Directory Permissions
         run: |
