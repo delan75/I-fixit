@@ -67,20 +67,37 @@ jobs:
           chmod -R 775 deploy/i-fixit/storage
 
       - name: Deploy to Hosting
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_SERVER }}
+          server: 92.113.19.74
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./deploy/
           server-dir: /public_html/
-          protocol: ftps
+          protocol: ftp
           port: 21
+          timeout: 120000
           exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
             **/.env.example
+            **/vendor/symfony/var-dumper/**
+            **/vendor/symfony/translation/**
+            **/vendor/symfony/string/**
+            **/vendor/symfony/service-contracts/**
+            **/vendor/symfony/routing/**
+            **/vendor/symfony/process/**
+            **/vendor/symfony/polyfill-**/**
+            **/vendor/symfony/mime/**
+            **/vendor/symfony/http-foundation/**
+            **/vendor/symfony/finder/**
+            **/vendor/symfony/event-dispatcher/**
+            **/vendor/symfony/error-handler/**
+            **/vendor/symfony/deprecation-contracts/**
+            **/vendor/symfony/css-selector/**
+            **/vendor/symfony/console/**
+            **/tests/**
         env:
           FTP_DEBUG: 1
 

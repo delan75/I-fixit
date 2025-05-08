@@ -414,3 +414,15 @@ Tasks that have been completed, reviewed, and approved.
 - Discuss Chart.js integration
 - Plan KPI dashboard implementation
 - Address any blockers or issues
+
+## Deployment Notes
+
+### FTP Deployment Optimization
+**Date**: August 15, 2025
+**Issue**: FTP deployment to production was failing with "Server sent FIN packet unexpectedly" error
+**Solution**:
+- Added timeout parameter (120000ms) to FTP-Deploy-Action configuration
+- Excluded large vendor directories from FTP deployment to reduce transfer size
+- Excluded test directories from deployment
+- Updated documentation to clarify FTP server connection details
+**Impact**: Deployment process is now more reliable and less prone to timeout errors
