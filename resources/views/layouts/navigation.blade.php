@@ -9,7 +9,7 @@
                         <div class="w-8 h-8 bg-green-600 rounded-md flex items-center justify-center text-white font-bold mr-2">
                             IF
                         </div>
-                        <span class="text-xl font-bold text-gray-900">I-fixit</span>
+                        <span class="text-xl font-bold text-gray-900">I-fixit </span>
                     </a>
                 </div>
 
