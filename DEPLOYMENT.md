@@ -159,10 +159,67 @@ The project now includes a GitHub Actions workflow for automated deployments:
 
          - name: Update index.php
            run: |
-             # Ensure index.php points to i-fixit directory
-             sed -i "s|__DIR__.'/../|__DIR__.'/i-fixit/|g" deploy/index.php
-             # Verify the change was made
-             cat deploy/index.php
+             # Create a new index.php file with the correct paths
+             cat > deploy/index.php << 'EOL'
+<?php
+
+use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Http\Request;
+
+define('LARAVEL_START', microtime(true));
+
+/*
+|--------------------------------------------------------------------------
+| Check If The Application Is Under Maintenance
+|--------------------------------------------------------------------------
+|
+| If the application is in maintenance / demo mode via the "down" command
+| we will load this file so that any pre-rendered content can be shown
+| instead of starting the framework, which could cause an exception.
+|
+*/
+
+if (file_exists($maintenance = __DIR__.'/i-fixit/storage/framework/maintenance.php')) {
+    require $maintenance;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Register The Auto Loader
+|--------------------------------------------------------------------------
+|
+| Composer provides a convenient, automatically generated class loader for
+| this application. We just need to utilize it! We'll simply require it
+| into the script here so we don't need to manually load our classes.
+|
+*/
+
+require __DIR__.'/i-fixit/vendor/autoload.php';
+
+/*
+|--------------------------------------------------------------------------
+| Run The Application
+|--------------------------------------------------------------------------
+|
+| Once we have the application, we can handle the incoming request using
+| the application's HTTP kernel. Then, we will send the response back
+| to this client's browser, allowing them to enjoy our application.
+|
+*/
+
+$app = require_once __DIR__.'/i-fixit/bootstrap/app.php';
+
+$kernel = $app->make(Kernel::class);
+
+$response = $kernel->handle(
+    $request = Request::capture()
+)->send();
+
+$kernel->terminate($request, $response);
+EOL
+             # Verify the file was created
+             echo "Created new index.php file with correct paths"
+             ls -la deploy/index.php
 
          - name: Ensure Storage Directory Permissions
            run: |
@@ -307,7 +364,7 @@ MAIL_FROM_NAME="${APP_NAME}"
    - **"Permission denied"**: Check that the FTP user has write permissions to the target directory
    - **"File not found"**: Ensure all paths in the deployment script are correct
    - **"Index.php not found"**: Verify that the public directory contents are being copied correctly
-   - **"Unexpected EOF while looking for matching"**: Check for syntax errors in shell commands, especially in sed commands with complex quotes and escape characters
+   - **"Unexpected EOF while looking for matching"**: This typically occurs with syntax errors in shell commands. Instead of using sed for complex file modifications, consider using a heredoc approach to create files with the exact content needed.
 
 ### Recovery Procedures
 
