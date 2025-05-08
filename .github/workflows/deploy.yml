@@ -74,11 +74,15 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./deploy/
           server-dir: /public_html/
+          protocol: ftp
+          port: 21
           exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
             **/.env.example
+        env:
+          FTP_DEBUG: 1
 
       - name: Run Post-Deployment Commands
         uses: appleboy/ssh-action@master

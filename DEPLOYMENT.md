@@ -175,11 +175,15 @@ The project now includes a GitHub Actions workflow for automated deployments:
              password: ${{ secrets.FTP_PASSWORD }}
              local-dir: ./deploy/
              server-dir: /public_html/
+             protocol: ftp
+             port: 21
              exclude: |
                **/.git*
                **/.git*/**
                **/node_modules/**
                **/.env.example
+           env:
+             FTP_DEBUG: 1
 
          - name: Run Post-Deployment Commands
            uses: appleboy/ssh-action@master
@@ -199,13 +203,15 @@ The project now includes a GitHub Actions workflow for automated deployments:
    ```
 
 2. **Required GitHub Secrets**:
-   - `FTP_SERVER`: Your hosting FTP server (usually your domain)
+   - `FTP_SERVER`: Your hosting FTP server hostname or IP address
    - `FTP_USERNAME`: Your hosting FTP username
    - `FTP_PASSWORD`: Your hosting FTP password
    - `SSH_HOST`: Your hosting SSH host
    - `SSH_USERNAME`: Your hosting SSH username
    - `SSH_PASSWORD`: Your hosting SSH password
    - `SSH_PORT`: Your hosting SSH port (usually 65002)
+
+   Note: For Hostinger, the FTP hostname is typically in the format `ftpXX.hostinger.com` or you can use the server's IP address.
 
 3. **How It Works**:
    - The workflow maintains your local development structure
@@ -303,10 +309,16 @@ MAIL_FROM_NAME="${APP_NAME}"
 5. **Deployment Failures**:
    - **"Project directory is not a git repository"**: Ensure the GitHub Actions workflow is using the correct repository URL
    - **"Failed to connect to FTP server"**: Verify FTP credentials in GitHub Secrets
+   - **"getaddrinfo ENOTFOUND"**: The FTP hostname cannot be resolved. For Hostinger, check if your FTP_SERVER value should be:
+     - Your domain name (e.g., `i-fixit.chisolution.io`)
+     - The Hostinger FTP server (e.g., `ftpXX.hostinger.com`)
+     - The server's IP address
+     - For Hostinger, you can find the correct FTP hostname in your hosting control panel under "FTP Accounts"
    - **"Permission denied"**: Check that the FTP user has write permissions to the target directory
    - **"File not found"**: Ensure all paths in the deployment script are correct
    - **"Index.php not found"**: Verify that the public directory contents are being copied correctly
    - **"Unexpected EOF while looking for matching"**: This typically occurs with syntax errors in shell commands. Instead of using sed for complex file modifications, consider using a heredoc approach to create files with the exact content needed.
+   - **"Protocol not supported"**: Try changing the protocol from 'ftp' to 'ftps' or vice versa in the workflow file
 
 ### Recovery Procedures
 
