@@ -6,7 +6,7 @@ The I-fixit application is currently deployed on Hostinger with the following st
 
 ```
 public_html/
-├── index.php (from Laravel's public directory)
+├── index.php (modified to point to i-fixit directory)
 ├── .htaccess (from Laravel's public directory)
 ├── build/ (compiled assets)
 │   └── manifest.json
@@ -47,6 +47,32 @@ public_html/
    $app = require_once __DIR__.'/i-fixit/bootstrap/app.php';
    ```
 
+   The full modified index.php should look like:
+   ```php
+   <?php
+
+   use Illuminate\Contracts\Http\Kernel;
+   use Illuminate\Http\Request;
+
+   define('LARAVEL_START', microtime(true));
+
+   if (file_exists($maintenance = __DIR__.'/i-fixit/storage/framework/maintenance.php')) {
+       require $maintenance;
+   }
+
+   require __DIR__.'/i-fixit/vendor/autoload.php';
+
+   $app = require_once __DIR__.'/i-fixit/bootstrap/app.php';
+
+   $kernel = $app->make(Kernel::class);
+
+   $response = $kernel->handle(
+       $request = Request::capture()
+   )->send();
+
+   $kernel->terminate($request, $response);
+   ```
+
 4. **Configure Environment**:
    - Ensure the `.env` file in `public_html/i-fixit/` has the correct production settings
    - Set `APP_ENV=production`
@@ -67,65 +93,94 @@ public_html/
    php artisan route:clear
    ```
 
-### Automated Deployment (Future Implementation)
+### Automated Deployment
 
-For future automated deployments, consider setting up a GitHub Actions workflow:
+The project now includes a GitHub Actions workflow for automated deployments:
 
-1. **Create a `.github/workflows/deploy.yml` file**:
+1. **The `.github/workflows/deploy.yml` file**:
    ```yaml
-   name: Deploy to Hostinger
+   name: Deploy to Production
 
    on:
      push:
        branches: [ main ]
 
    jobs:
-     build:
+     deploy:
        runs-on: ubuntu-latest
        steps:
-         - uses: actions/checkout@v3
-         
+         - name: Checkout code
+           uses: actions/checkout@v3
+           with:
+             repository: delan75/I-fixit
+             token: ${{ secrets.GITHUB_TOKEN }}
+
          - name: Setup PHP
            uses: shivammathur/setup-php@v2
            with:
              php-version: '8.2'
-             
+             extensions: mbstring, bcmath, pdo, pdo_mysql, exif, pcntl, gd
+
          - name: Install Composer Dependencies
            run: composer install --no-dev --optimize-autoloader
-           
+
          - name: Setup Node.js
            uses: actions/setup-node@v3
            with:
              node-version: '18'
-             
+
          - name: Install NPM Dependencies
            run: npm install
-           
+
          - name: Build Assets
            run: npm run build
-           
-         - name: Deploy to Hostinger
+
+         - name: Create i-fixit Directory Structure
+           run: |
+             mkdir -p deploy/i-fixit
+             mkdir -p deploy/build
+
+         - name: Copy Laravel Application to i-fixit Directory
+           run: |
+             # Copy all Laravel application files except public directory to i-fixit
+             rsync -av --exclude='public' --exclude='node_modules' --exclude='.git' --exclude='.github' --exclude='deploy' . deploy/i-fixit/
+
+         - name: Copy Public Files
+           run: |
+             # Copy public directory contents to deploy root
+             rsync -av public/ deploy/
+
+         - name: Copy Build Assets
+           run: |
+             # Copy build assets to deploy/build
+             if [ -d "public/build" ]; then
+               rsync -av public/build/ deploy/build/
+             fi
+
+         - name: Update index.php
+           run: |
+             # Ensure index.php points to i-fixit directory
+             sed -i 's|__DIR__.\'/\.\./|__DIR__.\'/i-fixit/|g' deploy/index.php
+
+         - name: Ensure Storage Directory Permissions
+           run: |
+             chmod -R 775 deploy/i-fixit/storage
+
+         - name: Deploy to Hosting
            uses: SamKirkland/FTP-Deploy-Action@v4.3.4
            with:
              server: ${{ secrets.FTP_SERVER }}
              username: ${{ secrets.FTP_USERNAME }}
              password: ${{ secrets.FTP_PASSWORD }}
-             local-dir: ./
-             server-dir: /domains/i-fixit.chisolution.io/public_html/i-fixit/
+             local-dir: ./deploy/
+             server-dir: /public_html/
              exclude: |
-               node_modules/**
-               public/**
-               
-         - name: Deploy Public Files
-           uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-           with:
-             server: ${{ secrets.FTP_SERVER }}
-             username: ${{ secrets.FTP_USERNAME }}
-             password: ${{ secrets.FTP_PASSWORD }}
-             local-dir: ./public/
-             server-dir: /domains/i-fixit.chisolution.io/public_html/
-             
-         - name: Run Migrations and Clear Cache
+               **/.git*
+               **/.git*/**
+               **/node_modules/**
+               **/.env.example
+
+         - name: Run Post-Deployment Commands
            uses: appleboy/ssh-action@master
            with:
              host: ${{ secrets.SSH_HOST }}
@@ -133,22 +188,28 @@ For future automated deployments, consider setting up a GitHub Actions workflow:
              password: ${{ secrets.SSH_PASSWORD }}
              port: ${{ secrets.SSH_PORT }}
              script: |
-               cd ~/domains/i-fixit.chisolution.io/public_html/i-fixit
+               cd ~/public_html/i-fixit
                php artisan migrate --force
-               php artisan config:cache
-               php artisan route:cache
-               php artisan view:cache
+               php artisan config:clear
+               php artisan cache:clear
+               php artisan view:clear
+               php artisan route:clear
                php artisan optimize
    ```
 
-2. **Add GitHub Secrets**:
-   - `FTP_SERVER`: Your Hostinger FTP server (usually your domain)
-   - `FTP_USERNAME`: Your Hostinger FTP username
-   - `FTP_PASSWORD`: Your Hostinger FTP password
-   - `SSH_HOST`: Your Hostinger SSH host (92.113.19.65)
-   - `SSH_USERNAME`: Your Hostinger SSH username (u382128891)
-   - `SSH_PASSWORD`: Your Hostinger SSH password
-   - `SSH_PORT`: Your Hostinger SSH port (65002)
+2. **Required GitHub Secrets**:
+   - `FTP_SERVER`: Your hosting FTP server (usually your domain)
+   - `FTP_USERNAME`: Your hosting FTP username
+   - `FTP_PASSWORD`: Your hosting FTP password
+   - `SSH_HOST`: Your hosting SSH host
+   - `SSH_USERNAME`: Your hosting SSH username
+   - `SSH_PASSWORD`: Your hosting SSH password
+   - `SSH_PORT`: Your hosting SSH port (usually 65002)
+
+3. **How It Works**:
+   - The workflow maintains your local development structure
+   - During deployment, it creates a temporary deployment structure that matches your hosting requirements
+   - This allows you to keep your preferred local development structure while ensuring the production environment has the correct structure
 
 ## Git Workflow
 
@@ -237,6 +298,13 @@ MAIL_FROM_NAME="${APP_NAME}"
    - Verify database credentials in .env
    - Check database server status
    - Ensure database user has correct permissions
+
+5. **Deployment Failures**:
+   - **"Project directory is not a git repository"**: Ensure the GitHub Actions workflow is using the correct repository URL
+   - **"Failed to connect to FTP server"**: Verify FTP credentials in GitHub Secrets
+   - **"Permission denied"**: Check that the FTP user has write permissions to the target directory
+   - **"File not found"**: Ensure all paths in the deployment script are correct
+   - **"Index.php not found"**: Verify that the public directory contents are being copied correctly
 
 ### Recovery Procedures
 
