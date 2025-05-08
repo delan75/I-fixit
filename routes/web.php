@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DealershipController;
 use App\Http\Controllers\ProfileController;
@@ -30,6 +31,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Contact routes
+Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
@@ -112,6 +117,11 @@ Route::middleware('auth')->group(function () {
         // Audit logs routes
         Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
         Route::get('audit-logs/{auditLog}', [AuditLogController::class, 'show'])->name('audit-logs.show');
+
+        // Contact messages admin routes
+        Route::get('contact-messages', [ContactController::class, 'adminIndex'])->name('contact.admin.index');
+        Route::get('contact-messages/{contact}', [ContactController::class, 'adminShow'])->name('contact.admin.show');
+        Route::delete('contact-messages/{contact}', [ContactController::class, 'adminDestroy'])->name('contact.admin.destroy');
     });
 
     // Superuser-only routes

@@ -124,7 +124,7 @@
                                 <span class="sr-only">Privacy</span>
                                 <span class="text-sm">Privacy Policy</span>
                             </a>
-                            <a href="#" class="text-gray-500 hover:text-gray-700">
+                            <a href="{{ route('contact.index') }}" class="text-gray-500 hover:text-gray-700">
                                 <span class="sr-only">Contact</span>
                                 <span class="text-sm">Contact Us</span>
                             </a>
@@ -154,7 +154,7 @@
                     };
                 }
 
-                // Fixed header scroll behavior
+                // header scroll behavior
                 const nav = document.querySelector('nav');
                 if (nav) {
                     window.addEventListener('scroll', function() {
