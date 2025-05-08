@@ -157,69 +157,11 @@ The project now includes a GitHub Actions workflow for automated deployments:
                rsync -av public/build/ deploy/build/
              fi
 
-         - name: Update index.php
+         # Skipping index.php update - will be done manually
+         - name: Note about index.php
            run: |
-             # Create a new index.php file with the correct paths
-             cat > deploy/index.php << 'EOL'
-<?php
-
-use Illuminate\Contracts\Http\Kernel;
-use Illuminate\Http\Request;
-
-define('LARAVEL_START', microtime(true));
-
-/*
-|--------------------------------------------------------------------------
-| Check If The Application Is Under Maintenance
-|--------------------------------------------------------------------------
-|
-| If the application is in maintenance / demo mode via the "down" command
-| we will load this file so that any pre-rendered content can be shown
-| instead of starting the framework, which could cause an exception.
-|
-*/
-
-if (file_exists($maintenance = __DIR__.'/i-fixit/storage/framework/maintenance.php')) {
-    require $maintenance;
-}
-
-/*
-|--------------------------------------------------------------------------
-| Register The Auto Loader
-|--------------------------------------------------------------------------
-|
-| Composer provides a convenient, automatically generated class loader for
-| this application. We just need to utilize it! We'll simply require it
-| into the script here so we don't need to manually load our classes.
-|
-*/
-
-require __DIR__.'/i-fixit/vendor/autoload.php';
-
-/*
-|--------------------------------------------------------------------------
-| Run The Application
-|--------------------------------------------------------------------------
-|
-| Once we have the application, we can handle the incoming request using
-| the application's HTTP kernel. Then, we will send the response back
-| to this client's browser, allowing them to enjoy our application.
-|
-*/
-
-$app = require_once __DIR__.'/i-fixit/bootstrap/app.php';
-
-$kernel = $app->make(Kernel::class);
-
-$response = $kernel->handle(
-    $request = Request::capture()
-)->send();
-
-$kernel->terminate($request, $response);
-EOL
-             # Verify the file was created
-             echo "Created new index.php file with correct paths"
-             ls -la deploy/index.php
+             echo "NOTE: index.php needs to be manually updated to point to the i-fixit directory"
+             echo "Please update paths in public_html/index.php to use __DIR__.'/i-fixit/' instead of __DIR__.'/../'"
 
          - name: Ensure Storage Directory Permissions
            run: |
@@ -415,4 +357,21 @@ MAIL_FROM_NAME="${APP_NAME}"
    - Keep Laravel and all packages updated
    - Apply security patches promptly
 
-This is the end of the file.
+## Manual Steps After Deployment
+
+1. **Update index.php**: Manually update the index.php file in the public_html directory to point to the i-fixit directory:
+   - Edit public_html/index.php
+   - Replace all instances of `__DIR__.'/../'` with `__DIR__.'/i-fixit/'`
+   - Example changes:
+     - `require __DIR__.'/../vendor/autoload.php'` → `require __DIR__.'/i-fixit/vendor/autoload.php'`
+     - `$app = require_once __DIR__.'/../bootstrap/app.php'` → `$app = require_once __DIR__.'/i-fixit/bootstrap/app.php'`
+     - `if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php'))` → `if (file_exists($maintenance = __DIR__.'/i-fixit/storage/framework/maintenance.php'))`
+
+2. **Database Migrations**: If there are database changes, run migrations manually or through the deployment script
+
+3. **Cache Clearing**: Clear application cache if needed
+
+4. **Configuration Check**: Verify that all environment variables are set correctly
+
+5. **Testing**: Perform basic functionality tests to ensure the application is working as expected
+
