@@ -12,15 +12,26 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // Add first_name and last_name columns
-            $table->string('first_name')->after('id')->nullable();
-            $table->string('last_name')->after('first_name')->nullable();
+            // Check if columns exist before adding them
+            if (!Schema::hasColumn('users', 'first_name')) {
+                $table->string('first_name')->after('id')->nullable();
+            }
 
-            // Add phone column with unique constraint
-            $table->string('phone')->after('email')->unique()->nullable();
+            if (!Schema::hasColumn('users', 'last_name')) {
+                $table->string('last_name')->after('first_name')->nullable();
+            }
 
-            // Add role column
-            $table->string('role')->after('phone')->default('user');
+            // Check if phone column exists
+            if (!Schema::hasColumn('users', 'phone')) {
+                $table->string('phone')->after('email')->nullable();
+            }
+
+            // We'll handle unique constraint separately to avoid issues with duplicate values
+
+            // Check if role column exists
+            if (!Schema::hasColumn('users', 'role')) {
+                $table->string('role')->after('phone')->default('user');
+            }
         });
     }
 

@@ -1,6 +1,17 @@
 <?php
 
+use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CarController;
+use App\Http\Controllers\CarImageController;
+use App\Http\Controllers\DamagedPartController;
+use App\Http\Controllers\LaborController;
+use App\Http\Controllers\PaintingController;
+use App\Http\Controllers\PartController;
+use App\Http\Controllers\SaleController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,14 +29,81 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Car routes
+    Route::resource('cars', CarController::class);
+
+    // Car Images routes
+    Route::get('cars/{car}/images/create', [CarImageController::class, 'create'])->name('car_images.create');
+    Route::post('cars/{car}/images', [CarImageController::class, 'store'])->name('car_images.store');
+    Route::delete('cars/{car}/images/{carImage}', [CarImageController::class, 'destroy'])->name('car_images.destroy');
+
+    // Damaged Parts routes
+    Route::get('cars/{car}/damaged-parts/create', [DamagedPartController::class, 'create'])->name('damaged_parts.create');
+    Route::post('cars/{car}/damaged-parts', [DamagedPartController::class, 'store'])->name('damaged_parts.store');
+    Route::get('cars/{car}/damaged-parts/{damagedPart}/edit', [DamagedPartController::class, 'edit'])->name('damaged_parts.edit');
+    Route::put('cars/{car}/damaged-parts/{damagedPart}', [DamagedPartController::class, 'update'])->name('damaged_parts.update');
+    Route::delete('cars/{car}/damaged-parts/{damagedPart}', [DamagedPartController::class, 'destroy'])->name('damaged_parts.destroy');
+    Route::delete('cars/{car}/damaged-parts/{damagedPart}/images/{image}', [DamagedPartController::class, 'destroyImage'])->name('damaged_part_images.destroy');
+
+    // Supplier routes
+    Route::resource('suppliers', SupplierController::class);
+
+    // Parts routes
+    Route::get('cars/{car}/parts/create', [PartController::class, 'create'])->name('parts.create');
+    Route::post('cars/{car}/parts', [PartController::class, 'store'])->name('parts.store');
+    Route::get('cars/{car}/parts/{part}/edit', [PartController::class, 'edit'])->name('parts.edit');
+    Route::put('cars/{car}/parts/{part}', [PartController::class, 'update'])->name('parts.update');
+    Route::delete('cars/{car}/parts/{part}', [PartController::class, 'destroy'])->name('parts.destroy');
+
+    // Labor routes
+    Route::get('cars/{car}/labor/create', [LaborController::class, 'create'])->name('labor.create');
+    Route::post('cars/{car}/labor', [LaborController::class, 'store'])->name('labor.store');
+    Route::get('cars/{car}/labor/{labor}/edit', [LaborController::class, 'edit'])->name('labor.edit');
+    Route::put('cars/{car}/labor/{labor}', [LaborController::class, 'update'])->name('labor.update');
+    Route::delete('cars/{car}/labor/{labor}', [LaborController::class, 'destroy'])->name('labor.destroy');
+
+    // Painting routes
+    Route::get('cars/{car}/painting/create', [PaintingController::class, 'create'])->name('painting.create');
+    Route::post('cars/{car}/painting', [PaintingController::class, 'store'])->name('painting.store');
+    Route::get('cars/{car}/painting/{painting}/edit', [PaintingController::class, 'edit'])->name('painting.edit');
+    Route::put('cars/{car}/painting/{painting}', [PaintingController::class, 'update'])->name('painting.update');
+    Route::delete('cars/{car}/painting/{painting}', [PaintingController::class, 'destroy'])->name('painting.destroy');
+
+    // Sale routes
+    Route::get('cars/{car}/sale/create', [SaleController::class, 'create'])->name('sales.create');
+    Route::post('cars/{car}/sale', [SaleController::class, 'store'])->name('sales.store');
+    Route::get('cars/{car}/sale/{sale}/edit', [SaleController::class, 'edit'])->name('sales.edit');
+    Route::put('cars/{car}/sale/{sale}', [SaleController::class, 'update'])->name('sales.update');
+    Route::delete('cars/{car}/sale/{sale}', [SaleController::class, 'destroy'])->name('sales.destroy');
+
+    // User management routes (admin only)
+    Route::middleware(['admin', 'sensitive:10,1'])->group(function () {
+        // Apply rate limiting to sensitive user operations
+        Route::post('users', [UserController::class, 'store'])->name('users.store');
+        Route::put('users/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+        Route::put('users/{user}/soft-delete', [UserController::class, 'softDelete'])->name('users.soft-delete');
+        Route::put('users/{user}/restore', [UserController::class, 'restore'])->name('users.restore');
+
+        // Less sensitive user operations
+        Route::get('users', [UserController::class, 'index'])->name('users.index');
+        Route::get('users/create', [UserController::class, 'create'])->name('users.create');
+        Route::get('users/{user}', [UserController::class, 'show'])->name('users.show');
+        Route::get('users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+
+        // Audit logs routes
+        Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
+        Route::get('audit-logs/{auditLog}', [AuditLogController::class, 'show'])->name('audit-logs.show');
+    });
 });
 
 require __DIR__.'/auth.php';

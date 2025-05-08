@@ -1,0 +1,34 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('car_images', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('car_id')->constrained()->onDelete('cascade');
+            $table->string('image_path');
+            $table->enum('image_type', ['before_repair', 'during_repair', 'after_repair', 'damage', 'other']);
+            $table->string('description')->nullable();
+            $table->timestamps();
+
+            // Add index for better performance
+            $table->index('car_id');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('car_images');
+    }
+};

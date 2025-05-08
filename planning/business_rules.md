@@ -25,18 +25,22 @@ I-fixit is a car investment tracking system designed to monitor the lifecycle of
 
 ### Phase 3: Dealership and Sale
 1. Listing date at the dealership must be recorded
-2. Asking price must be documented
+2. Asking price must be documented based on estimated market value
 3. The system must track how long the car remains at the dealership
-4. Final selling price must be recorded
+4. Actual selling price must be recorded (which may differ from estimated market value)
 5. Sale date must be timestamped
 6. A car is considered to have completed its investment cycle once marked as "sold"
+7. The system must support recording sales at a loss (e.g., when a car is sent back to auction)
+8. The system must distinguish between estimated market value (for projections) and actual selling price (for final calculations)
 
 ## Financial Rules
-1. Total investment is calculated as: Purchase Price + Parts Costs + Labor Costs + Painting Costs
-2. Profit/Loss is calculated as: Selling Price - Total Investment
-3. ROI is calculated as: (Profit/Loss ÷ Total Investment) × 100
-4. Each cost entry must be categorized appropriately (purchase, parts, labor, painting)
-5. The system must maintain a running total of investment for each car
+1. Total investment is calculated as: Purchase Price + Transportation Costs + Parts Costs + Labor Costs + Painting Costs + Other Costs
+2. Projected profit/loss is calculated as: Estimated Market Value - Total Investment (for cars not yet sold)
+3. Actual profit/loss is calculated as: Actual Selling Price - Total Investment (for sold cars)
+4. ROI is calculated as: (Profit/Loss ÷ Total Investment) × 100
+5. Each cost entry must be categorized appropriately (purchase, transportation, parts, labor, painting, other)
+6. The system must maintain a running total of investment for each car
+7. The system must provide both projected and actual financial metrics to guide purchasing decisions
 
 ## Reporting Rules
 1. The system must provide profitability analysis for each completed car investment

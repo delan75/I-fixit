@@ -88,6 +88,30 @@
             <p class="form-hint">{{ __('Enter your mobile number') }}</p>
         </div>
 
+        <!-- Gender -->
+        <div class="form-group">
+            <label class="form-label">{{ __('Gender') }}</label>
+            <div class="flex space-x-6 mt-2">
+                <div class="flex items-center">
+                    <input id="gender-male" name="gender" type="radio" value="male" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600" {{ old('gender') == 'male' ? 'checked' : '' }}>
+                    <label for="gender-male" class="ml-2 block text-sm font-medium leading-6 text-gray-900">{{ __('Male') }}</label>
+                </div>
+                <div class="flex items-center">
+                    <input id="gender-female" name="gender" type="radio" value="female" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600" {{ old('gender') == 'female' ? 'checked' : '' }}>
+                    <label for="gender-female" class="ml-2 block text-sm font-medium leading-6 text-gray-900">{{ __('Female') }}</label>
+                </div>
+                <div class="flex items-center">
+                    <input id="gender-other" name="gender" type="radio" value="other" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600" {{ old('gender') == 'other' ? 'checked' : '' }}>
+                    <label for="gender-other" class="ml-2 block text-sm font-medium leading-6 text-gray-900">{{ __('Other') }}</label>
+                </div>
+            </div>
+            <div class="error-message">
+                @error('gender')
+                    {{ $message }}
+                @enderror
+            </div>
+        </div>
+
         <!-- Password -->
         <div class="form-group">
             <label for="password" class="form-label">{{ __('Password') }}</label>

@@ -21,6 +21,16 @@
         <!-- Alpine.js -->
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
+        <!-- Autocomplete (only loaded on car form pages) -->
+        @if(request()->is('cars/create*') || request()->is('cars/*/edit*'))
+            <link rel="stylesheet" href="{{ asset('css/autocomplete.css') }}">
+            <script src="{{ asset('js/car-data.js') }}"></script>
+            <script src="{{ asset('js/car-attributes-data.js') }}"></script>
+            <script src="{{ asset('js/car-variants-data.js') }}"></script>
+            <script src="{{ asset('js/autocomplete.js') }}"></script>
+            <script src="{{ asset('js/car-autocomplete.js') }}"></script>
+        @endif
+
         <style>
             body {
                 font-family: 'DM Sans', sans-serif;
