@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DealershipController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\CarImageController;
@@ -44,7 +46,7 @@ Route::middleware('auth')->group(function () {
     // Car Images routes
     Route::get('cars/{car}/images/create', [CarImageController::class, 'create'])->name('car_images.create');
     Route::post('cars/{car}/images', [CarImageController::class, 'store'])->name('car_images.store');
-    Route::delete('cars/{car}/images/{carImage}', [CarImageController::class, 'destroy'])->name('car_images.destroy');
+    Route::delete('cars/{car}/images/{image}', [CarImageController::class, 'destroy'])->name('car_images.destroy');
 
     // Damaged Parts routes
     Route::get('cars/{car}/damaged-parts/create', [DamagedPartController::class, 'create'])->name('damaged_parts.create');
@@ -85,6 +87,13 @@ Route::middleware('auth')->group(function () {
     Route::put('cars/{car}/sale/{sale}', [SaleController::class, 'update'])->name('sales.update');
     Route::delete('cars/{car}/sale/{sale}', [SaleController::class, 'destroy'])->name('sales.destroy');
 
+    // Dealership routes
+    Route::get('dealership', [DealershipController::class, 'index'])->name('dealership.index');
+    Route::get('dealership/cars/{car}/record-sale', [DealershipController::class, 'recordSale'])->name('dealership.record-sale');
+    Route::post('dealership/cars/{car}/record-sale', [DealershipController::class, 'storeSale'])->name('dealership.store-sale');
+    Route::get('dealership/cars/{car}/edit-discount', [DealershipController::class, 'editDiscount'])->name('dealership.edit-discount');
+    Route::post('dealership/cars/{car}/update-discount', [DealershipController::class, 'updateDiscount'])->name('dealership.update-discount');
+
     // User management routes (admin only)
     Route::middleware(['admin', 'sensitive:10,1'])->group(function () {
         // Apply rate limiting to sensitive user operations
@@ -103,6 +112,14 @@ Route::middleware('auth')->group(function () {
         // Audit logs routes
         Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
         Route::get('audit-logs/{auditLog}', [AuditLogController::class, 'show'])->name('audit-logs.show');
+    });
+
+    // Superuser-only routes
+    Route::middleware(['superuser', 'sensitive:10,1'])->group(function () {
+        // Activity logs routes
+        Route::get('activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
+        Route::get('activity-logs/{activityLog}', [ActivityLogController::class, 'show'])->name('activity-logs.show');
+        Route::delete('activity-logs/clear', [ActivityLogController::class, 'clearAll'])->name('activity-logs.clear');
     });
 });
 

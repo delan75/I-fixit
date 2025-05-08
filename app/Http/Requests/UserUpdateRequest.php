@@ -15,17 +15,22 @@ class UserUpdateRequest extends BaseFormRequest
     public function authorize(): bool
     {
         $user = $this->route('user');
-        
+
         // Check if the user exists
         if (!$user) {
             return false;
         }
-        
-        // Admin can update any user
-        if (Auth::user()->role === 'admin') {
+
+        // Superuser can update any user
+        if (Auth::user()->isSuperuser()) {
             return true;
         }
-        
+
+        // Admin can update any user except superusers
+        if (Auth::user()->isAdmin()) {
+            return !$user->isSuperuser();
+        }
+
         // Regular users can only update their own profile
         return Auth::id() === $user->id;
     }
@@ -38,7 +43,7 @@ class UserUpdateRequest extends BaseFormRequest
     public function rules(): array
     {
         $user = $this->route('user');
-        
+
         $rules = [
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
@@ -47,9 +52,14 @@ class UserUpdateRequest extends BaseFormRequest
             'gender' => ['nullable', 'string', 'in:male,female,other'],
         ];
 
-        // Only admin can change roles
-        if (Auth::user()->role === 'admin') {
+        // Admin and superuser can change roles
+        if (Auth::user()->hasAdminAccess()) {
             $rules['role'] = ['sometimes', 'required', 'string', 'in:admin,user'];
+        }
+
+        // Only superuser can change superuser status
+        if (Auth::user()->isSuperuser()) {
+            $rules['is_superuser'] = ['sometimes', 'boolean'];
         }
 
         // Password is optional on update
@@ -69,17 +79,32 @@ class UserUpdateRequest extends BaseFormRequest
     protected function additionalValidation($validator)
     {
         $user = $this->route('user');
-        
-        // Prevent non-admin users from changing their own role
-        if (!Auth::user()->role === 'admin' && $this->has('role') && $this->input('role') !== $user->role) {
+        $currentUser = Auth::user();
+
+        // Prevent non-admin/non-superuser users from changing their own role
+        if (!$currentUser->role === 'admin' && !$currentUser->is_superuser &&
+            $this->has('role') && $this->input('role') !== $user->role) {
             $validator->errors()->add('role', 'You do not have permission to change roles.');
         }
-        
+
         // Prevent the last admin from being demoted
-        if (Auth::user()->role === 'admin' && $user->role === 'admin' && $this->input('role') === 'user') {
+        if ($user->role === 'admin' && $this->input('role') === 'user') {
             $adminCount = User::where('role', 'admin')->count();
             if ($adminCount <= 1) {
                 $validator->errors()->add('role', 'Cannot demote the last admin user.');
+            }
+        }
+
+        // Prevent non-superusers from changing superuser status
+        if (!$currentUser->is_superuser && $this->has('is_superuser')) {
+            $validator->errors()->add('is_superuser', 'You do not have permission to change superuser status.');
+        }
+
+        // Prevent removing the last superuser
+        if ($user->is_superuser && $this->has('is_superuser') && !$this->input('is_superuser')) {
+            $superuserCount = User::where('is_superuser', true)->count();
+            if ($superuserCount <= 1) {
+                $validator->errors()->add('is_superuser', 'Cannot remove the last superuser.');
             }
         }
     }

@@ -21,6 +21,11 @@
         <!-- Alpine.js -->
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
+        <!-- GLightbox (for image galleries) -->
+        <link rel="stylesheet" href="{{ asset('css/glightbox.min.css') }}">
+        <script src="{{ asset('js/glightbox.min.js') }}"></script>
+        <script src="{{ asset('js/custom-glightbox.js') }}"></script>
+
         <!-- Autocomplete (only loaded on car form pages) -->
         @if(request()->is('cars/create*') || request()->is('cars/*/edit*'))
             <link rel="stylesheet" href="{{ asset('css/autocomplete.css') }}">
@@ -35,6 +40,29 @@
             body {
                 font-family: 'DM Sans', sans-serif;
                 background-color: #F5F4F6;
+            }
+
+            /* Fixed header styles */
+            nav.fixed {
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                transition: box-shadow 0.3s ease;
+            }
+
+            /* Fixed header spacing for all screen sizes */
+            .pt-16 {
+                padding-top: 4rem; /* 64px */
+            }
+
+            /* Additional spacing for page header */
+            header.bg-white.shadow {
+                margin-top: 0;
+            }
+
+            /* Ensure content has proper spacing on all devices */
+            @media (min-width: 640px) {
+                .py-6 {
+                    padding-top: 1.5rem;
+                }
             }
 
             .btn-loading {
@@ -63,12 +91,12 @@
         </style>
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-50">
+        <div class="min-h-screen bg-gray-50 pt-16 sm:pt-20"><!-- Added responsive padding for fixed header spacing -->
             @include('layouts.navigation')
 
             <!-- Page Heading -->
             @if (isset($header))
-                <header class="bg-white shadow">
+                <header class="bg-white shadow relative z-10">
                     <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
@@ -124,6 +152,18 @@
                         setItem: function() {},
                         removeItem: function() {}
                     };
+                }
+
+                // Fixed header scroll behavior
+                const nav = document.querySelector('nav');
+                if (nav) {
+                    window.addEventListener('scroll', function() {
+                        if (window.scrollY > 10) {
+                            nav.classList.add('shadow-md');
+                        } else {
+                            nav.classList.remove('shadow-md');
+                        }
+                    });
                 }
 
                 // Form submission loading state

@@ -232,18 +232,33 @@
                     </div>
 
                     @if($car->images->count() > 0)
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="car-gallery image-gallery grid grid-cols-2 md:grid-cols-4 gap-4">
                             @foreach($car->images as $image)
                                 <div class="relative group">
-                                    <img src="{{ asset('storage/' . $image->image_path) }}" alt="{{ $image->description }}" class="h-40 w-full object-cover rounded-md">
-                                    <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center rounded-md">
-                                        <div class="text-white text-center p-2">
-                                            <p class="text-sm font-medium">{{ ucfirst($image->image_type) }}</p>
-                                            @if($image->description)
-                                                <p class="text-xs">{{ $image->description }}</p>
-                                            @endif
+                                    <a href="{{ asset('storage/' . $image->image_path) }}" class="gallery-item"
+                                       data-caption="{{ ucfirst(str_replace('_', ' ', $image->image_type)) }}"
+                                       data-title="{{ $car->year }} {{ $car->make }} {{ $car->model }} {{ $car->variant ?? '' }}{{ $image->description ? ' - ' . $image->description : '' }}"
+                                       data-image-id="{{ $image->id }}"
+                                       data-delete-url="{{ route('car_images.destroy', [$car, $image]) }}">
+                                        <img src="{{ asset('storage/' . $image->image_path) }}" alt="{{ $image->description }}" class="h-40 w-full object-cover rounded-md">
+                                        <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col items-center justify-center rounded-md">
+                                            <div class="text-white text-center p-2">
+                                                <p class="text-sm font-medium">{{ ucfirst($image->image_type) }}</p>
+                                                @if($image->description)
+                                                    <p class="text-xs">{{ $image->description }}</p>
+                                                @endif
+                                            </div>
+                                            <div class="mt-2">
+                                                <form action="{{ route('car_images.destroy', [$car, $image]) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this image?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white text-xs px-2 py-1 rounded">
+                                                        {{ __('Delete') }}
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </a>
                                 </div>
                             @endforeach
                         </div>
@@ -665,7 +680,17 @@
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="text-sm text-gray-500">{{ __('Dealership Discount:') }}</span>
-                                    <span class="text-sm font-medium">R {{ number_format($car->dealership_discount, 2) }}</span>
+                                    <span class="text-sm font-medium">
+                                        R {{ number_format($car->dealership_discount, 2) }}
+                                        @if($car->current_phase === 'dealership')
+                                            <a href="{{ route('dealership.edit-discount', $car) }}" class="ml-2 text-xs text-blue-600 hover:text-blue-900">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                                {{ __('Edit') }}
+                                            </a>
+                                        @endif
+                                    </span>
                                 </div>
 
                                 <!-- Projected Profit/Loss (always shown) -->

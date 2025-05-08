@@ -23,10 +23,14 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@example.com',
             'phone' => '123-456-7890',
             'role' => 'admin',
+            'is_superuser' => false,
             'status' => 'active',
         ]);
 
         // Create regular users
         User::factory(10)->create();
+
+        // Call the SuperuserSeeder to create a superuser
+        $this->call(SuperuserSeeder::class);
     }
 }

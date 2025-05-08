@@ -31,7 +31,7 @@ class DamagedPartController extends Controller
             'estimated_repair_cost' => 'required|numeric|min:0',
             'needs_replacement' => 'boolean',
             'is_repaired' => 'boolean',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         // Create the damaged part
@@ -52,6 +52,7 @@ class DamagedPartController extends Controller
                 $damagedPart->images()->create([
                     'image_path' => $path,
                     'description' => $request->input('image_description'),
+                    'image_type' => 'damage',
                 ]);
             }
         }
@@ -81,7 +82,7 @@ class DamagedPartController extends Controller
             'estimated_repair_cost' => 'required|numeric|min:0',
             'needs_replacement' => 'boolean',
             'is_repaired' => 'boolean',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         // Update the damaged part
@@ -102,6 +103,7 @@ class DamagedPartController extends Controller
                 $damagedPart->images()->create([
                     'image_path' => $path,
                     'description' => $request->input('image_description'),
+                    'image_type' => 'damage',
                 ]);
             }
         }

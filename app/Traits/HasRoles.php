@@ -12,6 +12,11 @@ trait HasRoles
      */
     public function hasRole(string $role): bool
     {
+        // Superusers have access to everything
+        if ($this->isSuperuser()) {
+            return true;
+        }
+
         return $this->role === $role;
     }
 
@@ -23,6 +28,11 @@ trait HasRoles
      */
     public function hasAnyRole(array $roles): bool
     {
+        // Superusers have access to everything
+        if ($this->isSuperuser()) {
+            return true;
+        }
+
         return in_array($this->role, $roles);
     }
 
@@ -34,12 +44,17 @@ trait HasRoles
      */
     public function hasAllRoles(array $roles): bool
     {
+        // Superusers have access to everything
+        if ($this->isSuperuser()) {
+            return true;
+        }
+
         foreach ($roles as $role) {
             if (!$this->hasRole($role)) {
                 return false;
             }
         }
-        
+
         return true;
     }
 
@@ -62,6 +77,28 @@ trait HasRoles
     public function setRole(string $role)
     {
         $this->role = $role;
+        return $this;
+    }
+
+    /**
+     * Check if the user is a superuser.
+     *
+     * @return bool
+     */
+    public function isSuperuser(): bool
+    {
+        return $this->is_superuser === true || $this->is_superuser === 1;
+    }
+
+    /**
+     * Set the user's superuser status.
+     *
+     * @param bool $status
+     * @return $this
+     */
+    public function setSuperuser(bool $status)
+    {
+        $this->is_superuser = $status;
         return $this;
     }
 }

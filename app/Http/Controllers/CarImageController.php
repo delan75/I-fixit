@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Car;
-use App\Models\CarImage;
+use App\Models\Image;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class CarImageController extends Controller
@@ -24,7 +25,7 @@ class CarImageController extends Controller
     {
         // Validate the request
         $request->validate([
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'image_type' => 'required|string|in:before_repair,during_repair,after_repair,damage,other',
             'description' => 'nullable|string|max:255',
         ]);
@@ -38,6 +39,9 @@ class CarImageController extends Controller
                     'image_path' => $path,
                     'image_type' => $request->input('image_type'),
                     'description' => $request->input('description'),
+                    'created_by' => Auth::id(),
+                    'updated_by' => Auth::id(),
+                    'status' => 'active',
                 ]);
             }
         }
@@ -49,15 +53,35 @@ class CarImageController extends Controller
     /**
      * Remove the specified car image from storage.
      */
-    public function destroy(Car $car, CarImage $carImage)
+    public function destroy(Car $car, Image $image)
     {
-        // Delete the image file from storage
-        Storage::disk('public')->delete($carImage->image_path);
+        // Check if the image belongs to the car
+        if ($image->imageable_id == $car->id && $image->imageable_type == get_class($car)) {
+            if (Auth::user()->role === 'admin') {
+                // Admin can permanently delete
+                // Delete the image file from storage
+                Storage::disk('public')->delete($image->image_path);
 
-        // Delete the image record
-        $carImage->delete();
+                // Permanently delete the image record
+                $image->forceDelete();
+
+                return redirect()->route('cars.show', $car)
+                    ->with('success', 'Image permanently deleted successfully.');
+            } else {
+                // Regular users can only soft delete (mark as inactive)
+                $image->status = 'inactive';
+                $image->updated_by = Auth::id();
+                $image->save();
+
+                // Soft delete the image
+                $image->delete();
+
+                return redirect()->route('cars.show', $car)
+                    ->with('success', 'Image deleted successfully.');
+            }
+        }
 
         return redirect()->route('cars.show', $car)
-            ->with('success', 'Image deleted successfully.');
+            ->with('error', 'Image not found or does not belong to this car.');
     }
 }

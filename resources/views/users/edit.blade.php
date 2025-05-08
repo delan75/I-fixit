@@ -61,8 +61,8 @@
                             <x-input-error :messages="$errors->get('gender')" class="mt-2" />
                         </div>
 
-                        <!-- Role (Only visible to admins) -->
-                        @if(Auth::user()->role === 'admin')
+                        <!-- Role (Only visible to admins and superusers) -->
+                        @if(Auth::user()->hasAdminAccess())
                         <div class="mt-4">
                             <x-input-label for="role" :value="__('Role')" />
                             <select id="role" name="role" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
@@ -70,6 +70,18 @@
                                 <option value="admin" {{ (old('role', $user->role) == 'admin') ? 'selected' : '' }}>Admin</option>
                             </select>
                             <x-input-error :messages="$errors->get('role')" class="mt-2" />
+                        </div>
+                        @endif
+
+                        <!-- Superuser Status (Only visible to superusers) -->
+                        @if(Auth::user()->isSuperuser())
+                        <div class="mt-4">
+                            <div class="flex items-center">
+                                <input id="is_superuser" name="is_superuser" type="checkbox" value="1" {{ old('is_superuser', $user->is_superuser) ? 'checked' : '' }} class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                <label for="is_superuser" class="ml-2 block text-sm text-gray-900">{{ __('Grant Superuser Privileges') }}</label>
+                            </div>
+                            <p class="mt-1 text-sm text-gray-500">{{ __('Superusers have full access to all system features, including activity logs and user management.') }}</p>
+                            <x-input-error :messages="$errors->get('is_superuser')" class="mt-2" />
                         </div>
                         @endif
 

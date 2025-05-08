@@ -249,13 +249,13 @@
                                 </div>
 
                                 <div>
-                                    <x-input-label for="estimated_repair_cost" :value="__('Estimated Repair Cost (R)')" />
+                                    <x-input-label for="estimated_repair_cost" :value="__('Estimated Repair Cost (R)')" id="repair_cost_label" />
                                     <x-text-input id="estimated_repair_cost" class="block mt-1 w-full" type="number" name="estimated_repair_cost" :value="old('estimated_repair_cost', $car->estimated_repair_cost)" min="0" step="0.01" />
                                     <x-input-error :messages="$errors->get('estimated_repair_cost')" class="mt-2" />
                                 </div>
 
                                 <div>
-                                    <x-input-label for="estimated_market_value" :value="__('Estimated Market Value (R)')" />
+                                    <x-input-label for="estimated_market_value" :value="__('Estimated Market Value (R)')" id="market_value_label" />
                                     <x-text-input id="estimated_market_value" class="block mt-1 w-full" type="number" name="estimated_market_value" :value="old('estimated_market_value', $car->estimated_market_value)" min="0" step="0.01" />
                                     <x-input-error :messages="$errors->get('estimated_market_value')" class="mt-2" />
                                 </div>
@@ -314,7 +314,7 @@
                                         file:text-sm file:font-semibold
                                         file:bg-green-50 file:text-green-700
                                         hover:file:bg-green-100" />
-                                    <p class="mt-1 text-sm text-gray-500">{{ __('You can upload multiple images. Accepted formats: JPG, PNG, GIF.') }}</p>
+                                    <p class="mt-1 text-sm text-gray-500">{{ __('You can upload multiple images. Accepted formats: JPG, PNG, GIF, WebP.') }}</p>
                                     <x-input-error :messages="$errors->get('images')" class="mt-2" />
                                 </div>
 
@@ -359,6 +359,36 @@
                 bodyTypeInputId: 'body_type',
                 colorInputId: 'color'
             });
+
+            // Get elements for dynamic label updates
+            const currentPhaseSelect = document.getElementById('current_phase');
+            const repairCostLabel = document.getElementById('repair_cost_label');
+            const marketValueLabel = document.getElementById('market_value_label');
+
+            // Function to update labels based on selected phase
+            function updateLabels() {
+                const selectedPhase = currentPhaseSelect.value;
+
+                // Update repair cost label
+                if (selectedPhase === 'dealership' || selectedPhase === 'sold') {
+                    repairCostLabel.textContent = "{{ __('Total Repair Cost (R)') }}";
+                } else {
+                    repairCostLabel.textContent = "{{ __('Estimated Repair Cost (R)') }}";
+                }
+
+                // Update market value label
+                if (selectedPhase === 'sold') {
+                    marketValueLabel.textContent = "{{ __('Actual Selling Price (R)') }}";
+                } else {
+                    marketValueLabel.textContent = "{{ __('Estimated Market Value (R)') }}";
+                }
+            }
+
+            // Set initial labels
+            updateLabels();
+
+            // Add event listener for phase changes
+            currentPhaseSelect.addEventListener('change', updateLabels);
         });
     </script>
 </x-app-layout>

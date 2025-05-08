@@ -37,6 +37,7 @@ class UserFactory extends Factory
             'phone' => fake()->phoneNumber(),
             'gender' => fake()->randomElement(['male', 'female', 'other']),
             'role' => 'user',
+            'is_superuser' => false,
             'status' => 'active',
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
@@ -61,6 +62,17 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'role' => 'admin',
+        ]);
+    }
+
+    /**
+     * Indicate that the user is a superuser.
+     */
+    public function superuser(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'admin',
+            'is_superuser' => true,
         ]);
     }
 }

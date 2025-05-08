@@ -34,12 +34,7 @@ Tasks that have been identified but not yet scheduled for implementation.
 ### 📋 To Do
 Tasks that are scheduled for implementation in the current or upcoming sprint.
 
-#### Sprint 5: Sales and Dealership
-- [ ] **T-039**: Create sales model and relationships (Priority: High, Effort: 3, Assignee: TBD)
-- [ ] **T-040**: Implement dealership phase dashboard (Priority: High, Effort: 4, Assignee: TBD)
-- [ ] **T-041**: Create sales recording interface (Priority: High, Effort: 3, Assignee: TBD)
-- [ ] **T-043**: Create dealership discount functionality (Priority: Medium, Effort: 2, Assignee: TBD)
-- [ ] **T-045**: Create sales completion workflow (Priority: High, Effort: 3, Assignee: TBD)
+
 
 #### Sprint 6: Reporting and Dashboard
 - [ ] **T-046**: Create main dashboard with KPIs (Priority: High, Effort: 4, Assignee: TBD)
@@ -94,7 +89,14 @@ Tasks that are currently being worked on.
 ### 👀 Review
 Tasks that have been completed and are awaiting review/approval.
 
-- [ ] **R-001**: No tasks currently in review
+#### Sprint 6: Activity Logging and Superuser Role
+- [x] **R-001**: Implement activity logging system (Priority: High, Effort: 4, Assignee: AI Assistant)
+- [x] **R-002**: Create superuser role with elevated permissions (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **R-003**: Implement permission hierarchy (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **R-004**: Create activity log views and controller (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **R-005**: Update user management to support superuser role (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **R-006**: Implement event listeners for activity logging (Priority: Medium, Effort: 2, Assignee: AI Assistant)
+- [x] **R-007**: Create model observers for activity tracking (Priority: Medium, Effort: 2, Assignee: AI Assistant)
 
 ### ✅ Done
 Tasks that have been completed, reviewed, and approved.
@@ -164,6 +166,13 @@ Tasks that have been completed, reviewed, and approved.
 - [x] **D-053**: Implement user profile management (Priority: High, Effort: 3, Assignee: AI Assistant)
 - [x] **D-054**: Add gender styling to user management (Priority: Low, Effort: 1, Assignee: AI Assistant)
 
+#### Sprint 5: Sales and Dealership
+- [x] **D-055**: Create sales model and relationships (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **D-056**: Implement dealership phase dashboard (Priority: High, Effort: 4, Assignee: AI Assistant)
+- [x] **D-057**: Create sales recording interface (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **D-058**: Create dealership discount functionality (Priority: Medium, Effort: 2, Assignee: AI Assistant)
+- [x] **D-059**: Create sales completion workflow (Priority: High, Effort: 3, Assignee: AI Assistant)
+
 ## Sprint Planning
 
 ### Previous Sprint: Project Setup
@@ -213,13 +222,13 @@ Tasks that have been completed, reviewed, and approved.
 - Implemented parts, labor, and painting cost tracking
 - Added damaged parts tracking with repair status
 
-### Current Sprint: Dashboard Enhancements and Bug Fixes
+### Previous Sprint: Dashboard Enhancements and Bug Fixes
 **Goal**: Enhance dashboard functionality and fix identified bugs
 **Start Date**: June 16, 2025
 **End Date**: June 29, 2025
-**Status**: In Progress
+**Status**: Completed
 **Tasks**: Various enhancements and bug fixes
-**Achievements so far**:
+**Achievements**:
 - Fixed SQL error in dashboard query for recent cars
 - Implemented proper styling for gender field in user management
 - Added updated_by column to users table
@@ -227,6 +236,42 @@ Tasks that have been completed, reviewed, and approved.
 - Fixed multi-step car form navigation
 - Improved vehicle code selection implementation
 - Enhanced damaged parts tracking with descriptions
+
+### Previous Sprint: Sales and Dealership
+**Goal**: Implement sales recording and dealership functionality
+**Start Date**: June 30, 2025
+**End Date**: July 13, 2025
+**Status**: Completed
+**Tasks**: T-039 through T-045
+**Achievements**:
+- Created dealership phase dashboard with KPIs
+- Implemented sales recording interface
+- Created dealership discount functionality
+- Implemented sales completion workflow
+- Added days at dealership tracking
+- Enhanced financial summary with discount information
+- Implemented profit calculation with dealership discount
+
+### Current Sprint: Activity Logging and Superuser Role
+**Goal**: Implement activity logging system and superuser role with elevated permissions
+**Start Date**: July 14, 2025
+**End Date**: July 27, 2025
+**Status**: In Review
+**Tasks**: R-001 through R-007
+**Achievements**:
+- Created activity_logs table for detailed user action tracking
+- Added is_superuser field to users table
+- Implemented ActivityLogService for logging various activities
+- Created ActivityLogController and views for managing logs
+- Implemented SuperuserMiddleware for access control
+- Updated HasRoles trait to respect the superuser role
+- Updated UserPolicy to prevent admins from managing superusers
+- Added superuser-specific Gates in AuthServiceProvider
+- Updated user management views to include superuser options
+- Created event listeners for login and logout events
+- Implemented LogsActivity trait for model activity tracking
+- Created ActivityLogObserver for automatic activity logging
+- Created SuperuserSeeder for creating a default superuser account
 
 ## Milestone Tracking
 
@@ -256,7 +301,7 @@ Tasks that have been completed, reviewed, and approved.
 **Status**: Partially Implemented
 **Tasks**: T-039 through T-053
 **Description**: Implement sales recording, profit calculation, and reporting features
-**Progress**: 20% (Some features like profit calculation and dashboard with recent cars already implemented)
+**Progress**: 60% (Sales recording, dealership dashboard, and profit calculation implemented; reporting features still pending)
 
 ### Milestone 5: Advanced Features
 **Target Date**: [TBD]
@@ -338,11 +383,34 @@ Tasks that have been completed, reviewed, and approved.
 - Added functionality to record actual selling price when a car is sold
 - Implemented profit calculation based on actual selling price rather than estimated value
 
-### Next Meeting
-**Date**: June 16, 2025
+### Sprint 5 Review Meeting
+**Date**: July 13, 2025
+**Attendees**: Project Team
+**Key Points**:
+- Successfully completed all Sprint 5 tasks
+- Implemented dealership phase dashboard with KPIs
+- Created sales recording interface
+- Implemented dealership discount functionality
+- Created sales completion workflow
+- Enhanced financial summary with discount information
+- Implemented profit calculation with dealership discount
+- Fixed issue with days at dealership calculation
+
+### Previous Meeting
+**Date**: July 14, 2025
 **Agenda**:
-- Kick off Sprint 5: Sales and Dealership
-- Review sales recording requirements
-- Discuss profit calculation implementation
-- Plan dealership phase dashboard
+- Kick off Sprint 6: Activity Logging and Superuser Role
+- Review activity logging requirements
+- Discuss superuser role implementation
+- Plan permission hierarchy
+- Address any blockers or issues
+
+### Next Meeting
+**Date**: July 28, 2025
+**Agenda**:
+- Review Sprint 6: Activity Logging and Superuser Role
+- Kick off Sprint 7: Reporting and Dashboard
+- Review reporting requirements
+- Discuss Chart.js integration
+- Plan KPI dashboard implementation
 - Address any blockers or issues

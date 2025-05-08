@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\Auditable;
 use App\Traits\HasAuthorization;
+use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -161,7 +162,7 @@ class Car extends Model
         $laborCost = $this->laborEntries()->sum('total_cost');
         $paintingCost = $this->paintingEntries()->sum('total_cost');
 
-        return $this->purchase_price +
+        $totalInvestment = $this->purchase_price +
                $this->transportation_cost +
                $this->registration_papers_cost +
                $this->number_plates_cost +
@@ -169,6 +170,13 @@ class Car extends Model
                $partsCost +
                $laborCost +
                $paintingCost;
+
+        // Dealership discount is subtracted from the total investment
+        if ($this->dealership_discount) {
+            $totalInvestment -= $this->dealership_discount;
+        }
+
+        return $totalInvestment;
     }
 
     /**
@@ -193,6 +201,24 @@ class Car extends Model
         }
 
         return $this->estimated_market_value - $this->getTotalInvestmentAttribute();
+    }
+
+    /**
+     * Calculate the effective selling price after applying dealership discount.
+     */
+    public function getEffectiveSellingPriceAttribute()
+    {
+        if (!$this->sale || !$this->sale->selling_price) {
+            return $this->estimated_market_value;
+        }
+
+        $sellingPrice = $this->sale->selling_price;
+
+        if ($this->dealership_discount) {
+            $sellingPrice -= $this->dealership_discount;
+        }
+
+        return $sellingPrice;
     }
 
     /**

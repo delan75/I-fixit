@@ -85,7 +85,7 @@
                                         file:text-sm file:font-semibold
                                         file:bg-green-50 file:text-green-700
                                         hover:file:bg-green-100" />
-                                    <p class="mt-1 text-sm text-gray-500">{{ __('You can upload multiple images of the damaged part. Accepted formats: JPG, PNG, GIF.') }}</p>
+                                    <p class="mt-1 text-sm text-gray-500">{{ __('You can upload multiple images of the damaged part. Accepted formats: JPG, PNG, GIF, WebP.') }}</p>
                                     <x-input-error :messages="$errors->get('images')" class="mt-2" />
                                 </div>
 
@@ -100,10 +100,15 @@
                         @if($damagedPart->images->count() > 0)
                             <div class="mb-6">
                                 <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('Existing Images') }}</h3>
-                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 image-gallery">
                                     @foreach($damagedPart->images as $image)
                                         <div class="relative group">
-                                            <img src="{{ asset('storage/' . $image->image_path) }}" alt="{{ $image->description }}" class="h-40 w-full object-cover rounded-md">
+                                            <a href="{{ asset('storage/' . $image->image_path) }}" class="gallery-item"
+                                               data-caption="{{ ucfirst(str_replace('_', ' ', $image->image_type ?? 'damage')) }}"
+                                               data-title="{{ $damagedPart->part_name }} - {{ $car->year }} {{ $car->make }} {{ $car->model }}{{ $image->description ? ' - ' . $image->description : '' }}"
+                                               data-image-id="{{ $image->id }}"
+                                               data-delete-url="{{ route('damaged_part_images.destroy', [$car, $damagedPart, $image]) }}">
+                                                <img src="{{ asset('storage/' . $image->image_path) }}" alt="{{ $image->description }}" class="h-40 w-full object-cover rounded-md">
                                             <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center rounded-md">
                                                 <div class="text-white text-center p-2">
                                                     @if($image->description)
@@ -116,6 +121,7 @@
                                                     </form>
                                                 </div>
                                             </div>
+                                            </a>
                                         </div>
                                     @endforeach
                                 </div>
