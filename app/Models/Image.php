@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\HasAuthorization;
 
 class Image extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes, HasAuthorization;
 
     /**
      * The attributes that are mass assignable.
@@ -20,6 +22,18 @@ class Image extends Model
         'image_type',
         'imageable_id',
         'imageable_type',
+        'created_by',
+        'updated_by',
+        'status',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'deleted_at' => 'datetime',
     ];
 
     /**

@@ -37,9 +37,15 @@
                                 </div>
                                 <div>
                                     <span class="text-gray-500">Role:</span>
-                                    <span class="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $user->role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800' }}">
-                                        {{ ucfirst($user->role) }}
-                                    </span>
+                                    @if($user->isSuperuser())
+                                        <span class="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-200 text-purple-800">
+                                            Superuser
+                                        </span>
+                                    @else
+                                        <span class="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $user->role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800' }}">
+                                            {{ ucfirst($user->role) }}
+                                        </span>
+                                    @endif
                                 </div>
                                 <div>
                                     <span class="text-gray-500">Status:</span>
@@ -58,7 +64,7 @@
                             </div>
                         </div>
 
-                        @if(Auth::user()->hasRole('admin'))
+                        @if(Auth::user()->hasAdminAccess())
                         <div>
                             <h3 class="text-lg font-medium text-gray-900">User Actions</h3>
                             <div class="mt-4 space-y-4">

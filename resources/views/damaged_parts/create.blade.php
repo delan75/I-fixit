@@ -84,7 +84,7 @@
                                         file:text-sm file:font-semibold
                                         file:bg-green-50 file:text-green-700
                                         hover:file:bg-green-100" />
-                                    <p class="mt-1 text-sm text-gray-500">{{ __('You can upload multiple images of the damaged part. Accepted formats: JPG, PNG, GIF.') }}</p>
+                                    <p class="mt-1 text-sm text-gray-500">{{ __('You can upload multiple images of the damaged part. Accepted formats: JPG, PNG, GIF, WebP.') }}</p>
                                     <x-input-error :messages="$errors->get('images')" class="mt-2" />
                                 </div>
 

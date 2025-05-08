@@ -12,8 +12,8 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
-        // Only admin can view the user listing
-        return $user->role === 'admin';
+        // Admin or superuser can view the user listing
+        return $user->hasAdminAccess();
     }
 
     /**
@@ -21,9 +21,14 @@ class UserPolicy
      */
     public function view(User $user, User $model): bool
     {
-        // Admin can view any user
-        if ($user->role === 'admin') {
+        // Superuser can view any user
+        if ($user->isSuperuser()) {
             return true;
+        }
+
+        // Admin can view any user except superusers
+        if ($user->isAdmin()) {
+            return !$model->isSuperuser();
         }
 
         // Regular users can only view their own profile
@@ -35,8 +40,8 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        // Only admin can create users
-        return $user->role === 'admin';
+        // Admin or superuser can create users
+        return $user->hasAdminAccess();
     }
 
     /**
@@ -44,9 +49,14 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
-        // Admin can update any user
-        if ($user->role === 'admin') {
+        // Superuser can update any user
+        if ($user->isSuperuser()) {
             return true;
+        }
+
+        // Admin can update any user except superusers
+        if ($user->isAdmin()) {
+            return !$model->isSuperuser();
         }
 
         // Regular users can only update their own profile
@@ -58,8 +68,17 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        // Only admin can permanently delete users
-        return $user->role === 'admin';
+        // Superuser can delete any user
+        if ($user->isSuperuser()) {
+            return true;
+        }
+
+        // Admin can delete any user except superusers
+        if ($user->isAdmin()) {
+            return !$model->isSuperuser();
+        }
+
+        return false;
     }
 
     /**
@@ -67,8 +86,17 @@ class UserPolicy
      */
     public function restore(User $user, User $model): bool
     {
-        // Only admin can restore users
-        return $user->role === 'admin';
+        // Superuser can restore any user
+        if ($user->isSuperuser()) {
+            return true;
+        }
+
+        // Admin can restore any user except superusers
+        if ($user->isAdmin()) {
+            return !$model->isSuperuser();
+        }
+
+        return false;
     }
 
     /**
@@ -76,8 +104,8 @@ class UserPolicy
      */
     public function forceDelete(User $user, User $model): bool
     {
-        // Only admin can permanently delete users
-        return $user->role === 'admin';
+        // Only superuser can permanently delete users
+        return $user->isSuperuser();
     }
 
     /**
@@ -85,8 +113,21 @@ class UserPolicy
      */
     public function softDelete(User $user, User $model): bool
     {
-        // Only admin can soft delete users
         // Prevent users from soft deleting themselves
-        return $user->role === 'admin' && $user->id !== $model->id;
+        if ($user->id === $model->id) {
+            return false;
+        }
+
+        // Superuser can soft delete any user
+        if ($user->isSuperuser()) {
+            return true;
+        }
+
+        // Admin can soft delete any user except superusers
+        if ($user->isAdmin()) {
+            return !$model->isSuperuser();
+        }
+
+        return false;
     }
 }

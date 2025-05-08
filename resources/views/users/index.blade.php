@@ -129,9 +129,15 @@
                                                 @endif
                                             </td>
                                             <td class="py-2 px-4 border-b border-gray-200">
-                                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $user->role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800' }}">
-                                                    {{ ucfirst($user->role) }}
-                                                </span>
+                                                @if($user->isSuperuser())
+                                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-200 text-purple-800">
+                                                        Superuser
+                                                    </span>
+                                                @else
+                                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $user->role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800' }}">
+                                                        {{ ucfirst($user->role) }}
+                                                    </span>
+                                                @endif
                                             </td>
                                             <td class="py-2 px-4 border-b border-gray-200">
                                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
@@ -141,23 +147,37 @@
                                             </td>
                                             <td class="py-2 px-4 border-b border-gray-200">
                                                 <div class="flex space-x-2">
-                                                    <a href="{{ route('users.edit', $user) }}" class="text-blue-600 hover:text-blue-900">Edit</a>
+                                                    @can('update', $user)
+                                                        <a href="{{ route('users.edit', $user) }}" class="text-blue-600 hover:text-blue-900">Edit</a>
+                                                    @endcan
 
-                                                    @if($user->status === 'active')
-                                                        <form method="POST" action="{{ route('users.soft-delete', $user) }}" class="inline" onsubmit="return confirm('Are you sure you want to deactivate this user?');">
-                                                            @csrf
-                                                            @method('PUT')
-                                                            <button type="submit" class="text-yellow-600 hover:text-yellow-900">Deactivate</button>
-                                                        </form>
-                                                    @else
-                                                        <form method="POST" action="{{ route('users.restore', $user) }}" class="inline" onsubmit="return confirm('Are you sure you want to reactivate this user?');">
-                                                            @csrf
-                                                            @method('PUT')
-                                                            <button type="submit" class="text-green-600 hover:text-green-900">Activate</button>
-                                                        </form>
-                                                    @endif
+                                                    @can('softDelete', $user)
+                                                        @if($user->status === 'active')
+                                                            <form method="POST" action="{{ route('users.soft-delete', $user) }}" class="inline" onsubmit="return confirm('Are you sure you want to deactivate this user?');">
+                                                                @csrf
+                                                                @method('PUT')
+                                                                <button type="submit" class="text-yellow-600 hover:text-yellow-900">Deactivate</button>
+                                                            </form>
+                                                        @else
+                                                            <form method="POST" action="{{ route('users.restore', $user) }}" class="inline" onsubmit="return confirm('Are you sure you want to reactivate this user?');">
+                                                                @csrf
+                                                                @method('PUT')
+                                                                <button type="submit" class="text-green-600 hover:text-green-900">Activate</button>
+                                                            </form>
+                                                        @endif
+                                                    @endcan
 
-                                                    <button type="button" class="text-red-600 hover:text-red-900" onclick="confirmDelete({{ $user->id }})">Delete</button>
+                                                    @can('delete', $user)
+                                                        <button type="button" class="text-red-600 hover:text-red-900" onclick="confirmDelete({{ $user->id }})">Delete</button>
+                                                    @endcan
+
+                                                    @cannot('update', $user)
+                                                        @cannot('softDelete', $user)
+                                                            @cannot('delete', $user)
+                                                                <span class="text-gray-400">No actions available</span>
+                                                            @endcannot
+                                                        @endcannot
+                                                    @endcannot
                                                 </div>
                                             </td>
                                         </tr>

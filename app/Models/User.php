@@ -45,6 +45,7 @@ class User extends Authenticatable
         'gender',
         'password',
         'role',
+        'is_superuser',
         'status',
         'created_by',
         'updated_by',
@@ -208,6 +209,22 @@ class User extends Authenticatable
     public function isAdmin()
     {
         return $this->role === 'admin';
+    }
+
+    /**
+     * Check if the user is a superuser.
+     */
+    public function isSuperuser()
+    {
+        return $this->is_superuser === true || $this->is_superuser === 1;
+    }
+
+    /**
+     * Check if the user has superuser or admin privileges.
+     */
+    public function hasAdminAccess()
+    {
+        return $this->isAdmin() || $this->isSuperuser();
     }
 
     /**

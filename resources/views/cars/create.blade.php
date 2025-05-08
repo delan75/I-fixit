@@ -334,16 +334,20 @@
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                                     </div>
 
-                                    <!-- Estimated Repair Cost -->
+                                    <!-- Repair Cost (Estimated or Actual based on phase) -->
                                     <div>
-                                        <label for="estimated_repair_cost" class="block text-sm font-medium text-gray-700">{{ __('Estimated Repair Cost') }}</label>
+                                        <label for="estimated_repair_cost" class="block text-sm font-medium text-gray-700" id="repair_cost_label">
+                                            {{ __('Estimated Repair Cost') }}
+                                        </label>
                                         <input type="number" name="estimated_repair_cost" id="estimated_repair_cost" value="{{ old('estimated_repair_cost', $car->estimated_repair_cost ?? '') }}"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                                     </div>
 
-                                    <!-- Estimated Market Value -->
+                                    <!-- Market Value (Estimated or Actual based on phase) -->
                                     <div>
-                                        <label for="estimated_market_value" class="block text-sm font-medium text-gray-700">{{ __('Estimated Market Value') }}</label>
+                                        <label for="estimated_market_value" class="block text-sm font-medium text-gray-700" id="market_value_label">
+                                            {{ __('Estimated Market Value') }}
+                                        </label>
                                         <input type="number" name="estimated_market_value" id="estimated_market_value" value="{{ old('estimated_market_value', $car->estimated_market_value ?? '') }}"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                                     </div>
@@ -400,6 +404,42 @@
                 bodyTypeInputId: 'body_type',
                 colorInputId: 'color'
             });
+        });
+    </script>
+    @endif
+
+    @if($step == 4)
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get elements
+            const currentPhaseSelect = document.getElementById('current_phase');
+            const repairCostLabel = document.getElementById('repair_cost_label');
+            const marketValueLabel = document.getElementById('market_value_label');
+
+            // Function to update labels based on selected phase
+            function updateLabels() {
+                const selectedPhase = currentPhaseSelect.value;
+
+                // Update repair cost label
+                if (selectedPhase === 'dealership' || selectedPhase === 'sold') {
+                    repairCostLabel.textContent = "{{ __('Total Repair Cost') }}";
+                } else {
+                    repairCostLabel.textContent = "{{ __('Estimated Repair Cost') }}";
+                }
+
+                // Update market value label
+                if (selectedPhase === 'sold') {
+                    marketValueLabel.textContent = "{{ __('Actual Selling Price') }}";
+                } else {
+                    marketValueLabel.textContent = "{{ __('Estimated Market Value') }}";
+                }
+            }
+
+            // Set initial labels
+            updateLabels();
+
+            // Add event listener for phase changes
+            currentPhaseSelect.addEventListener('change', updateLabels);
         });
     </script>
     @endif

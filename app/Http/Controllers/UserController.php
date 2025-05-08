@@ -27,6 +27,11 @@ class UserController extends Controller
         // Start with a base query
         $query = User::query();
 
+        // If user is admin but not superuser, exclude superusers from the listing
+        if (Auth::user()->isAdmin() && !Auth::user()->isSuperuser()) {
+            $query->where('is_superuser', false);
+        }
+
         // Apply filters if provided
         if ($request->filled('role')) {
             $query->where('role', $request->input('role'));
@@ -77,14 +82,21 @@ class UserController extends Controller
         // Check if user has permission to create users
         Gate::authorize('admin-action');
 
-        $request->validate([
+        $validationRules = [
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'phone' => ['required', 'string', 'max:20', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'string', 'in:admin,user'],
-        ]);
+        ];
+
+        // Only superusers can create other superusers
+        if (Auth::user()->isSuperuser()) {
+            $validationRules['is_superuser'] = ['sometimes', 'boolean'];
+        }
+
+        $request->validate($validationRules);
 
         // Sanitize and prepare data
         $userData = [
@@ -98,6 +110,13 @@ class UserController extends Controller
             'status' => 'active',
             'created_by' => Auth::id(),
         ];
+
+        // Set superuser status if the current user is a superuser and the field was provided
+        if (Auth::user()->isSuperuser() && $request->has('is_superuser')) {
+            $userData['is_superuser'] = (bool) $request->is_superuser;
+        } else {
+            $userData['is_superuser'] = false;
+        }
 
         $user = User::create($userData);
 
@@ -150,18 +169,38 @@ class UserController extends Controller
         $user->phone = trim($validated['phone']);
         $user->gender = isset($validated['gender']) ? trim($validated['gender']) : null;
 
-        // Only admin can change roles
-        if (Auth::user()->role === 'admin' && isset($validated['role'])) {
-            // Additional check to prevent the last admin from being demoted
-            if ($user->role === 'admin' && $validated['role'] === 'user') {
-                $adminCount = User::where('role', 'admin')->count();
-                if ($adminCount <= 1) {
-                    return redirect()->back()
-                        ->withInput()
-                        ->withErrors(['role' => 'Cannot demote the last admin user.']);
+        // Handle role changes
+        if (isset($validated['role'])) {
+            // Only admin or superuser can change roles
+            if (Auth::user()->hasAdminAccess()) {
+                // Additional check to prevent the last admin from being demoted
+                if ($user->role === 'admin' && $validated['role'] === 'user') {
+                    $adminCount = User::where('role', 'admin')->count();
+                    if ($adminCount <= 1) {
+                        return redirect()->back()
+                            ->withInput()
+                            ->withErrors(['role' => 'Cannot demote the last admin user.']);
+                    }
                 }
+                $user->role = $validated['role'];
             }
-            $user->role = $validated['role'];
+        }
+
+        // Handle superuser status changes
+        if (isset($validated['is_superuser'])) {
+            // Only superusers can change superuser status
+            if (Auth::user()->isSuperuser()) {
+                // Prevent removing the last superuser
+                if ($user->isSuperuser() && !$validated['is_superuser']) {
+                    $superuserCount = User::where('is_superuser', true)->count();
+                    if ($superuserCount <= 1) {
+                        return redirect()->back()
+                            ->withInput()
+                            ->withErrors(['is_superuser' => 'Cannot remove the last superuser.']);
+                    }
+                }
+                $user->is_superuser = (bool) $validated['is_superuser'];
+            }
         }
 
         // Update password if provided
@@ -191,31 +230,30 @@ class UserController extends Controller
     public function destroy(Request $request, User $user)
     {
         // Check if user has permission to delete this user
-        if (Auth::user()->role === 'admin') {
-            // Admin can permanently delete, but must confirm with password
-            $this->authorize('delete', $user);
+        $this->authorize('delete', $user);
 
-            // Validate the password
-            $request->validate([
-                'password' => 'required',
-            ]);
+        // Validate the password
+        $request->validate([
+            'password' => 'required',
+        ]);
 
-            // Verify the admin's password
-            if (!Hash::check($request->password, Auth::user()->password)) {
-                return redirect()->route('users.index')
-                    ->with('error', 'Incorrect password. User was not deleted.');
-            }
-
-            // Password is correct, proceed with deletion
-            $user->delete();
-            $message = 'User permanently deleted successfully.';
-        } else {
-            // Regular users cannot delete users
-            abort(403, 'Unauthorized action.');
+        // Verify the user's password
+        if (!Hash::check($request->password, Auth::user()->password)) {
+            return redirect()->route('users.index')
+                ->with('error', 'Incorrect password. User was not deleted.');
         }
 
+        // Password is correct, proceed with deletion
+        $user->delete();
+
+        // Log the action
+        Log::info('User deleted', [
+            'deleted_user_id' => $user->id,
+            'deleted_by' => Auth::id()
+        ]);
+
         return redirect()->route('users.index')
-            ->with('success', $message);
+            ->with('success', 'User permanently deleted successfully.');
     }
 
     /**
@@ -225,6 +263,12 @@ class UserController extends Controller
     {
         // Check if user has permission to soft delete this user
         $this->authorize('softDelete', $user);
+
+        // Additional check to prevent deactivating superusers by non-superusers
+        if ($user->isSuperuser() && !Auth::user()->isSuperuser()) {
+            return redirect()->route('users.index')
+                ->with('error', 'You do not have permission to deactivate superusers.');
+        }
 
         // Use direct DB update to bypass model events
         DB::table('users')
@@ -248,6 +292,12 @@ class UserController extends Controller
     {
         // Check if user has permission to restore this user
         $this->authorize('restore', $user);
+
+        // Additional check to prevent restoring superusers by non-superusers
+        if ($user->isSuperuser() && !Auth::user()->isSuperuser()) {
+            return redirect()->route('users.index')
+                ->with('error', 'You do not have permission to activate superusers.');
+        }
 
         // Use direct DB update to bypass model events
         DB::table('users')
