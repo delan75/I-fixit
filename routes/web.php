@@ -61,6 +61,10 @@ Route::middleware('auth')->group(function () {
     Route::get('reports/{report}/export/pdf', [ReportController::class, 'exportPdf'])->name('reports.export.pdf');
     Route::get('reports/{report}/export/excel', [ReportController::class, 'exportExcel'])->name('reports.export.excel');
 
+    // Scheduled Report routes
+    Route::resource('scheduled-reports', ScheduledReportController::class);
+    Route::put('scheduled-reports/{scheduledReport}/toggle-active', [ScheduledReportController::class, 'toggleActive'])->name('scheduled-reports.toggle-active');
+
     // Notification routes
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('notifications/{notification}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
