@@ -173,6 +173,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the scheduled reports for the user.
+     */
+    public function scheduledReports()
+    {
+        return $this->hasMany(ScheduledReport::class);
+    }
+
+    /**
      * Get the notifications for the user.
      */
     public function notifications()
