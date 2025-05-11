@@ -32,5 +32,8 @@ class DatabaseSeeder extends Seeder
 
         // Call the SuperuserSeeder to create a superuser
         $this->call(SuperuserSeeder::class);
+
+        // Seed report types
+        $this->call(ReportTypeSeeder::class);
     }
 }

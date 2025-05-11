@@ -37,13 +37,13 @@ Tasks that are scheduled for implementation in the current or upcoming sprint.
 
 
 #### Sprint 6: Reporting and Dashboard
-- [ ] **T-046**: Create main dashboard with KPIs (Priority: High, Effort: 4, Assignee: TBD)
-- [ ] **T-047**: Implement Chart.js integration (Priority: High, Effort: 3, Assignee: TBD)
-- [ ] **T-048**: Create profitability reports (Priority: High, Effort: 4, Assignee: TBD)
-- [ ] **T-049**: Implement repair cost analysis reports (Priority: High, Effort: 4, Assignee: TBD)
-- [ ] **T-050**: Create sales performance reports (Priority: High, Effort: 3, Assignee: TBD)
-- [ ] **T-051**: Implement PDF export functionality (Priority: High, Effort: 3, Assignee: TBD)
-- [ ] **T-052**: Create Excel/CSV export functionality (Priority: High, Effort: 3, Assignee: TBD)
+- [x] **T-046**: Create main dashboard with KPIs (Priority: High, Effort: 4, Assignee: AI Assistant)
+- [x] **T-047**: Implement Chart.js integration (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **T-048**: Create profitability reports (Priority: High, Effort: 4, Assignee: AI Assistant)
+- [x] **T-049**: Implement repair cost analysis reports (Priority: High, Effort: 4, Assignee: AI Assistant)
+- [x] **T-050**: Create sales performance reports (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **T-051**: Implement PDF export functionality (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **T-052**: Create Excel/CSV export functionality (Priority: High, Effort: 3, Assignee: AI Assistant)
 - [ ] **T-053**: Implement report scheduling (Priority: Medium, Effort: 4, Assignee: TBD)
 
 #### Sprint 7: Notifications and Real-time Features
@@ -84,10 +84,14 @@ Tasks that are scheduled for implementation in the current or upcoming sprint.
 ### 🔄 In Progress
 Tasks that are currently being worked on.
 
-- [ ] **IP-001**: No tasks currently in progress
+- [ ] **IP-001**: Update supplier functionality documentation (Priority: Medium, Effort: 2, Assignee: Developer)
 
 ### 👀 Review
 Tasks that have been completed and are awaiting review/approval.
+
+#### Sprint 7: Supplier Functionality Enhancement
+- [x] **R-005**: Enhance supplier functionality to allow admin/superuser to view and restore inactive suppliers (Priority: Medium, Effort: 3, Assignee: Developer)
+- [ ] **R-006**: Review supplier functionality documentation (Priority: Low, Effort: 1, Assignee: TBD)
 
 #### Sprint 6: Activity Logging and Superuser Role
 - [x] **R-001**: Implement activity logging system (Priority: High, Effort: 4, Assignee: AI Assistant)
@@ -133,7 +137,7 @@ Tasks that have been completed, reviewed, and approved.
 - [x] **D-026**: Create database migrations for documents table (Priority: High, Effort: 2, Assignee: AI Assistant)
 - [x] **D-027**: Create database migrations for notifications table (Priority: High, Effort: 2, Assignee: AI Assistant)
 - [x] **D-028**: Create database migrations for activity log table (Priority: Medium, Effort: 2, Assignee: AI Assistant)
-- [x] **D-029**: Implement user authentication with 2FA (Priority: High, Effort: 3, Assignee: AI Assistant)
+- [x] **D-029**: Implement user authentication with optional 2FA (Priority: High, Effort: 3, Assignee: AI Assistant)
 - [x] **D-030**: Create user management CRUD operations (Priority: High, Effort: 3, Assignee: AI Assistant)
 - [x] **D-031**: Implement multi-step form with save/next/back functionality (Priority: High, Effort: 4, Assignee: AI Assistant)
 
@@ -197,7 +201,7 @@ Tasks that have been completed, reviewed, and approved.
 **Tasks**: T-008 through T-021
 **Achievements**:
 - Successfully created all database migrations for the system
-- Implemented user authentication with 2FA
+- Implemented user authentication with optional 2FA
 - Created user management CRUD operations
 - Set up relationships between models
 - Implemented multi-step car form with save/next/back functionality
@@ -298,10 +302,10 @@ Tasks that have been completed, reviewed, and approved.
 
 ### Milestone 4: Sales and Reporting
 **Target Date**: July 15, 2025
-**Status**: Partially Implemented
+**Status**: Implemented
 **Tasks**: T-039 through T-053
 **Description**: Implement sales recording, profit calculation, and reporting features
-**Progress**: 60% (Sales recording, dealership dashboard, and profit calculation implemented; reporting features still pending)
+**Progress**: 95% (Sales recording, dealership dashboard, profit calculation, and reporting features implemented; only report scheduling pending)
 
 ### Milestone 5: Advanced Features
 **Target Date**: [TBD]

@@ -32,7 +32,7 @@
                 <div class="p-6 bg-white border-b border-gray-200">
                     <form action="{{ route('suppliers.index') }}" method="GET">
                         <div class="flex flex-col lg:flex-row lg:items-end lg:space-x-4 space-y-4 lg:space-y-0">
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 flex-grow">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 flex-grow">
                                 <!-- Search Bar -->
                                 <div>
                                     <label for="search" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Search') }}</label>
@@ -50,6 +50,18 @@
                                         @endforeach
                                     </select>
                                 </div>
+
+                                <!-- Status Filter (Admin/Superuser Only) -->
+                                @if(Auth::user()->hasAdminAccess())
+                                <div>
+                                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">{{ __('Status') }}</label>
+                                    <select id="status" name="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-500 focus:ring-opacity-50">
+                                        <option value="">{{ __('All Statuses') }}</option>
+                                        <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>{{ __('Active') }}</option>
+                                        <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>{{ __('Inactive') }}</option>
+                                    </select>
+                                </div>
+                                @endif
                             </div>
                             <div class="flex-shrink-0">
                                 <button type="submit" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
@@ -79,7 +91,8 @@
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Contact Person') }}</th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Phone') }}</th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Email') }}</th>
-                                        @if(Auth::user()->hasRole('admin'))
+                                        @if(Auth::user()->hasAdminAccess())
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Status') }}</th>
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Created By') }}</th>
                                         @endif
                                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Actions') }}</th>
@@ -103,7 +116,20 @@
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm text-gray-500">{{ $supplier->email ?? 'N/A' }}</div>
                                             </td>
-                                            @if(Auth::user()->hasRole('admin'))
+                                            @if(Auth::user()->hasAdminAccess())
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm">
+                                                    @if($supplier->status === 'active')
+                                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                            {{ __('Active') }}
+                                                        </span>
+                                                    @else
+                                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                                            {{ __('Inactive') }}
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 @if($supplier->creator)
                                                     <div class="text-sm text-gray-500">
@@ -120,13 +146,24 @@
                                                 <div class="flex space-x-2">
                                                     <a href="{{ route('suppliers.show', $supplier) }}" class="text-green-600 hover:text-green-900">{{ __('View') }}</a>
                                                     <a href="{{ route('suppliers.edit', $supplier) }}" class="text-blue-600 hover:text-blue-900">{{ __('Edit') }}</a>
-                                                    <form action="{{ route('suppliers.destroy', $supplier) }}" method="POST" class="inline" onsubmit="return confirm('{{ Auth::user()->hasRole('admin') ? 'Are you sure you want to permanently delete this supplier?' : 'Are you sure you want to mark this supplier as inactive?' }}');">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="text-red-600 hover:text-red-900">
-                                                            {{ Auth::user()->hasRole('admin') ? __('Delete') : __('Deactivate') }}
-                                                        </button>
-                                                    </form>
+
+                                                    @if($supplier->status === 'active')
+                                                        <form action="{{ route('suppliers.destroy', $supplier) }}" method="POST" class="inline" onsubmit="return confirm('{{ Auth::user()->hasAdminAccess() ? 'Are you sure you want to permanently delete this supplier?' : 'Are you sure you want to mark this supplier as inactive?' }}');">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="text-red-600 hover:text-red-900">
+                                                                {{ Auth::user()->hasAdminAccess() ? __('Delete') : __('Delete') }}
+                                                            </button>
+                                                        </form>
+                                                    @elseif(Auth::user()->hasAdminAccess() && $supplier->status === 'inactive')
+                                                        <form action="{{ route('suppliers.restore', $supplier) }}" method="POST" class="inline">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <button type="submit" class="text-green-600 hover:text-green-900">
+                                                                {{ __('Reactivate') }}
+                                                            </button>
+                                                        </form>
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>

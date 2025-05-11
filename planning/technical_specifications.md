@@ -47,7 +47,11 @@ This document outlines the technical specifications for the I-fixit car investme
 
 ## Authentication and Security
 - Implement Laravel Breeze/Jetstream for authentication
-- Enable Two-Factor Authentication
+- Enable Two-Factor Authentication as an optional feature
+  - Google Authenticator compatible TOTP implementation
+  - QR code for easy setup
+  - Recovery codes for backup access
+  - User-controlled activation/deactivation
 - Role-based access control via middleware
 - CSRF protection for all forms
 - Input validation and sanitization
