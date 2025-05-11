@@ -197,6 +197,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the preferences for the user.
+     */
+    public function preferences()
+    {
+        return $this->hasOne(UserPreference::class);
+    }
+
+    /**
      * Scope a query to only include active users.
      */
     public function scopeActive($query)
