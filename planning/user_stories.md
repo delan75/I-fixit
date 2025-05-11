@@ -102,6 +102,15 @@ This document outlines the user stories for the I-fixit car investment tracking 
 8. As a parts supplier, I want to offer special pricing for bulk orders so that I can increase sales
 9. As a parts supplier, I want to mark parts as discontinued so that they're no longer ordered
 
+## Admin/Superuser Supplier Management Stories
+
+### Supplier Management
+1. As an admin/superuser, I want to view all suppliers (including inactive ones) so that I can manage the supplier database
+2. As an admin/superuser, I want to filter suppliers by status so that I can focus on active or inactive suppliers
+3. As an admin/superuser, I want to restore inactive suppliers so that they can be used again
+4. As an admin/superuser, I want to permanently delete suppliers (if they have no associated parts) so that I can maintain a clean database
+5. As an admin/superuser, I want to see who created each supplier so that I can track supplier management
+
 ### Reporting
 10. As a parts supplier, I want to view reports on parts I've supplied so that I can track my business
 11. As a parts supplier, I want to see which car makes/models use my parts most so that I can optimize inventory

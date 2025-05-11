@@ -217,7 +217,7 @@
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                     @if(isset($car->purchase_price))
-                                                    R {{ number_format($car->purchase_price, 2) }}
+                                                    @zar($car->purchase_price)
                                                     @else
                                                     N/A
                                                     @endif
@@ -327,6 +327,15 @@
                                 </svg>
                             </div>
                             <span class="text-sm font-medium text-gray-900">{{ __('Edit Profile') }}</span>
+                        </a>
+
+                        <a href="{{ route('notifications.test') }}" class="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                            <div class="p-3 bg-red-100 rounded-full mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                </svg>
+                            </div>
+                            <span class="text-sm font-medium text-gray-900">{{ __('Test Notification') }}</span>
                         </a>
                     </div>
                 </div>

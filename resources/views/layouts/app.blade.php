@@ -21,6 +21,9 @@
         <!-- Alpine.js -->
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
+        <!-- Chart.js (for reports) -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
         <!-- GLightbox (for image galleries) -->
         <link rel="stylesheet" href="{{ asset('css/glightbox.min.css') }}">
         <script src="{{ asset('js/glightbox.min.js') }}"></script>
@@ -179,5 +182,28 @@
                 });
             });
         </script>
+
+        <!-- Initialize Chart.js for report charts -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Initialize all chart canvases
+                const chartCanvases = document.querySelectorAll('.chart-canvas');
+                chartCanvases.forEach(canvas => {
+                    const chartType = canvas.dataset.chartType;
+                    const chartData = JSON.parse(canvas.dataset.chartData || '{}');
+                    const chartOptions = JSON.parse(canvas.dataset.chartOptions || '{}');
+
+                    if (chartType && chartData) {
+                        new Chart(canvas, {
+                            type: chartType,
+                            data: chartData,
+                            options: chartOptions
+                        });
+                    }
+                });
+            });
+        </script>
+
+        @stack('scripts')
     </body>
 </html>

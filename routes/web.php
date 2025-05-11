@@ -5,13 +5,16 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DealershipController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TestNotificationController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\CarImageController;
 use App\Http\Controllers\DamagedPartController;
 use App\Http\Controllers\LaborController;
 use App\Http\Controllers\PaintingController;
 use App\Http\Controllers\PartController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
@@ -53,6 +56,19 @@ Route::middleware('auth')->group(function () {
     Route::post('cars/{car}/images', [CarImageController::class, 'store'])->name('car_images.store');
     Route::delete('cars/{car}/images/{image}', [CarImageController::class, 'destroy'])->name('car_images.destroy');
 
+    // Report routes
+    Route::resource('reports', ReportController::class);
+    Route::get('reports/{report}/export/pdf', [ReportController::class, 'exportPdf'])->name('reports.export.pdf');
+    Route::get('reports/{report}/export/excel', [ReportController::class, 'exportExcel'])->name('reports.export.excel');
+
+    // Notification routes
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('notifications/{notification}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
+    Route::post('notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-as-read');
+    Route::get('notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
+    Route::get('notifications/recent', [NotificationController::class, 'getRecent'])->name('notifications.recent');
+    Route::get('notifications/test', [TestNotificationController::class, 'sendTestNotification'])->name('notifications.test');
+
     // Damaged Parts routes
     Route::get('cars/{car}/damaged-parts/create', [DamagedPartController::class, 'create'])->name('damaged_parts.create');
     Route::post('cars/{car}/damaged-parts', [DamagedPartController::class, 'store'])->name('damaged_parts.store');
@@ -63,6 +79,7 @@ Route::middleware('auth')->group(function () {
 
     // Supplier routes
     Route::resource('suppliers', SupplierController::class);
+    Route::put('suppliers/{supplier}/restore', [SupplierController::class, 'restore'])->name('suppliers.restore');
 
     // Parts routes
     Route::get('cars/{car}/parts/create', [PartController::class, 'create'])->name('parts.create');

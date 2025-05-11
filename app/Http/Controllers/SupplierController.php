@@ -19,18 +19,23 @@ class SupplierController extends Controller
         // Get query parameters for filtering
         $search = $request->query('search');
         $createdBy = $request->query('created_by');
+        $status = $request->query('status');
 
         // Start with a base query
         $query = Supplier::query();
 
-        // Apply authorization filter - admin sees all, users see only their own
+        // Apply authorization filter - admin/superuser sees all, users see only their own
         $user = Auth::user();
-        if ($user->role !== 'admin') {
+        if (!$user->hasAdminAccess()) {
             $query->where('created_by', $user->id);
+            // Regular users can only see active records
+            $query->where('status', 'active');
+        } else {
+            // Admin and superuser can filter by status if provided
+            if ($status) {
+                $query->where('status', $status);
+            }
         }
-
-        // Only show active records
-        $query->where('status', 'active');
 
         // Apply search filter if provided
         if ($search) {
@@ -162,8 +167,8 @@ class SupplierController extends Controller
         }
 
         // Check if user has permission to delete this supplier
-        if (Auth::user()->role === 'admin') {
-            // Admin can permanently delete
+        if (Auth::user()->hasAdminAccess()) {
+            // Admin/Superuser can permanently delete
             $this->authorize('delete', $supplier);
             $supplier->delete();
             $message = 'Supplier permanently deleted successfully.';
@@ -178,5 +183,30 @@ class SupplierController extends Controller
 
         return redirect()->route('suppliers.index')
             ->with('success', $message);
+    }
+
+    /**
+     * Restore an inactive supplier.
+     */
+    public function restore(Supplier $supplier)
+    {
+        // Only admin/superuser can restore suppliers
+        if (!Auth::user()->hasAdminAccess()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Check if the supplier is inactive
+        if ($supplier->status !== 'inactive') {
+            return redirect()->route('suppliers.show', $supplier)
+                ->with('error', 'Supplier is already active.');
+        }
+
+        // Restore the supplier
+        $supplier->status = 'active';
+        $supplier->updated_by = Auth::id();
+        $supplier->save();
+
+        return redirect()->route('suppliers.index')
+            ->with('success', 'Supplier reactivated successfully.');
     }
 }
