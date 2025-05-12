@@ -22,7 +22,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6 bg-white border-b border-gray-200">
                     <h3 class="text-xl font-semibold text-gray-900 mb-5">{{ __('Select a Report Type to Generate') }}</h3>
-                    <p class="text-gray-600 mb-6">Click on any of the green "Generate Report" buttons below to create a new report.</p>
+                    <p class="text-gray-600 mb-6">Generate various reports in pdf and excel.</p>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         @foreach ($reportTypes as $reportType)

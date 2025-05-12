@@ -1,7 +1,7 @@
 # I-fixit Supplier Functionality Documentation
 
 ## Overview
-This document outlines the supplier management functionality in the I-fixit car investment tracking system. The supplier module allows users to manage parts suppliers, track supplier information, and maintain relationships with vendors providing parts for car repairs.
+This document outlines the supplier management functionality in the I-fixit car investment tracking system. The supplier module allows users to manage parts suppliers, track supplier information, and maintain relationships with vendors providing parts for car repairs. The system implements a role-based access control system with soft delete functionality to ensure data integrity and appropriate access levels.
 
 ## User Roles and Permissions
 
@@ -13,6 +13,7 @@ This document outlines the supplier management functionality in the I-fixit car 
 - Cannot see suppliers created by other users
 - Cannot see inactive (soft-deleted) suppliers
 - Cannot restore inactive suppliers
+- Can only see active suppliers in dropdown lists when assigning to parts
 
 ### Admin Users
 - Can create new suppliers
@@ -23,10 +24,12 @@ This document outlines the supplier management functionality in the I-fixit car 
 - Can view inactive (soft-deleted) suppliers
 - Can restore inactive suppliers
 - Can filter suppliers by status (active/inactive)
+- Can see all suppliers in dropdown lists when assigning to parts
 
 ### Superusers
 - Have all the permissions of admin users
 - Intended for system administrators with full access
+- Can perform all supplier-related actions regardless of who created the supplier
 
 ## Database Structure
 
@@ -109,21 +112,25 @@ This document outlines the supplier management functionality in the I-fixit car 
 ## User Interface
 
 ### Supplier Listing Page
-- Table with supplier details
+- Responsive table with supplier details that adapts to different screen sizes
 - Status indicator for admin/superuser (green for active, red for inactive)
-- Action buttons (View, Edit, Delete/Deactivate, Restore)
-- Filter and search functionality
-- Pagination controls
+- Mobile-friendly action buttons (View, Edit, Delete/Deactivate, Restore)
+- Filter and search functionality with collapsible filters on mobile
+- Pagination controls optimized for touch interfaces
+- Card-based layout on smaller screens for better readability
 
 ### Supplier Details Page
-- Display all supplier information
-- Show related parts (if any)
-- Action buttons for edit, delete, etc.
+- Display all supplier information in a responsive layout
+- Show related parts (if any) with horizontal scrolling on mobile
+- Action buttons for edit, delete, etc. that adapt to screen size
+- Collapsible sections for better organization on mobile devices
 
 ### Supplier Form (Create/Edit)
-- Input fields for all supplier attributes
-- Validation feedback
-- Submit and cancel buttons
+- Responsive input fields for all supplier attributes
+- Real-time validation feedback
+- Mobile-friendly submit and cancel buttons
+- Stacked form layout on smaller screens
+- Touch-friendly input elements
 
 ## Testing Considerations
 - Test permission checks for different user roles
@@ -131,6 +138,25 @@ This document outlines the supplier management functionality in the I-fixit car 
 - Test filtering by status
 - Test permanent deletion with and without associated parts
 - Test validation rules for required fields
+- Test responsive design on various device sizes
+- Test touch interactions on mobile devices
+- Test accessibility compliance
+
+## Mobile Responsiveness
+- Implements Bootstrap 5 responsive grid system
+- Uses mobile-first approach for all UI components
+- Adapts layout based on screen size (xs, sm, md, lg, xl, xxl)
+- Provides touch-friendly interface elements
+- Implements collapsible sections for better mobile experience
+- Uses appropriate font sizes and spacing for mobile readability
+- Ensures buttons and interactive elements have adequate touch targets (minimum 44x44px)
+
+## Accessibility Features
+- Proper ARIA attributes for screen readers
+- Sufficient color contrast for all UI elements
+- Keyboard navigable interface
+- Descriptive alt text for icons and images
+- Focus indicators for keyboard users
 
 ## Future Enhancements
 - Supplier performance metrics
@@ -138,3 +164,6 @@ This document outlines the supplier management functionality in the I-fixit car 
 - Price comparison between suppliers
 - Integration with external supplier databases
 - Supplier rating system
+- Geolocation integration for nearby suppliers
+- QR code generation for quick supplier contact
+- Mobile app integration for on-the-go supplier management

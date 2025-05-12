@@ -12,11 +12,13 @@ use App\Models\ReportType;
 use App\Models\Sale;
 use App\Models\Supplier;
 use App\Models\User;
+use App\Services\ActivityLogService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 
 class ReportController extends Controller
 {
@@ -34,6 +36,15 @@ class ReportController extends Controller
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
+
+        // Log reports index view activity
+        ActivityLogService::log(
+            'view_reports_index',
+            "Viewed reports index page",
+            null,
+            ['report_count' => $recentReports->count()],
+            Auth::id()
+        );
 
         return view('reports.index', compact('reportTypes', 'recentReports'));
     }
@@ -76,6 +87,15 @@ class ReportController extends Controller
             // Regular users can only see their own cars
             $cars = Car::where('user_id', Auth::id())->with(['sale'])->get();
         }
+
+        // Log report creation form view activity
+        ActivityLogService::log(
+            'view_report_form',
+            "Viewed report creation form for type: {$reportType->name}",
+            $reportType,
+            null,
+            Auth::id()
+        );
 
         return view('reports.create', compact('reportType', 'makes', 'years', 'phases', 'dateRanges', 'users', 'cars'));
     }
@@ -217,6 +237,15 @@ class ReportController extends Controller
         $report->generated_at = now();
         $report->save();
 
+        // Log report generation activity
+        ActivityLogService::log(
+            'generate_report',
+            "Generated report: {$report->title} (Type: {$report->reportType->name})",
+            $report,
+            ['report_type' => $report->reportType->name],
+            Auth::id()
+        );
+
         return redirect()->route('reports.show', $report)
             ->with('success', 'Report generated successfully.');
     }
@@ -231,6 +260,15 @@ class ReportController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
+        // Log report view activity
+        ActivityLogService::log(
+            'view_report',
+            "Viewed report: {$report->title} (Type: {$report->reportType->name})",
+            $report,
+            ['report_type' => $report->reportType->name],
+            Auth::id()
+        );
+
         return view('reports.show', compact('report'));
     }
 
@@ -244,10 +282,39 @@ class ReportController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        // TODO: Implement PDF export functionality
-        // This would typically use a package like dompdf or barryvdh/laravel-dompdf
+        // Generate PDF based on report type
+        $pdf = \PDF::loadView('reports.pdf.' . $report->reportType->slug, [
+            'report' => $report,
+            'data' => $report->data,
+        ]);
 
-        return back()->with('info', 'PDF export functionality will be implemented soon.');
+        // Set PDF options
+        $pdf->setPaper('a4', 'portrait');
+        $pdf->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+            'defaultFont' => 'sans-serif',
+        ]);
+
+        // Generate filename
+        $filename = Str::slug($report->title) . '-' . date('Y-m-d') . '.pdf';
+
+        // Update report with file information
+        $report->file_path = 'reports/' . $filename;
+        $report->file_type = 'pdf';
+        $report->save();
+
+        // Log PDF export activity
+        ActivityLogService::log(
+            'export_report',
+            "Exported report to PDF: {$report->title} (Type: {$report->reportType->name})",
+            $report,
+            ['format' => 'pdf', 'report_type' => $report->reportType->name],
+            Auth::id()
+        );
+
+        // Return the PDF as a download
+        return $pdf->download($filename);
     }
 
     /**
@@ -262,10 +329,32 @@ class ReportController extends Controller
 
         $format = $request->query('format', 'xlsx');
 
-        // TODO: Implement Excel/CSV export functionality
-        // This would typically use a package like maatwebsite/excel
+        // Create the export class based on report type
+        $export = new \App\Exports\ReportExport($report);
 
-        return back()->with('info', 'Excel/CSV export functionality will be implemented soon.');
+        // Generate filename
+        $filename = Str::slug($report->title) . '-' . date('Y-m-d');
+
+        // Update report with file information
+        $report->file_path = 'reports/' . $filename . '.' . $format;
+        $report->file_type = $format;
+        $report->save();
+
+        // Log Excel/CSV export activity
+        ActivityLogService::log(
+            'export_report',
+            "Exported report to {$format}: {$report->title} (Type: {$report->reportType->name})",
+            $report,
+            ['format' => $format, 'report_type' => $report->reportType->name],
+            Auth::id()
+        );
+
+        // Return the Excel/CSV file as a download
+        if ($format === 'csv') {
+            return \Maatwebsite\Excel\Facades\Excel::download($export, $filename . '.csv', \Maatwebsite\Excel\Excel::CSV);
+        } else {
+            return \Maatwebsite\Excel\Facades\Excel::download($export, $filename . '.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        }
     }
 
     /**
@@ -278,7 +367,25 @@ class ReportController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
+        // Store report details before deletion for logging
+        $reportTitle = $report->title;
+        $reportType = $report->reportType->name;
+        $reportId = $report->id;
+
         $report->delete();
+
+        // Log report deletion activity
+        ActivityLogService::log(
+            'delete_report',
+            "Deleted report: {$reportTitle} (Type: {$reportType})",
+            null,
+            [
+                'report_id' => $reportId,
+                'report_title' => $reportTitle,
+                'report_type' => $reportType
+            ],
+            Auth::id()
+        );
 
         return redirect()->route('reports.index')
             ->with('success', 'Report deleted successfully.');
@@ -568,6 +675,66 @@ class ReportController extends Controller
         // Calculate estimated value of unsold cars
         $estimatedValue = $cars->whereNotIn('current_phase', ['sold'])->sum('estimated_market_value');
 
+        // Group by make for investment analysis
+        $investmentByMake = $cars->groupBy('make')->map(function ($carGroup) {
+            $makeInvestment = $carGroup->sum(function ($car) {
+                return $car->getTotalInvestmentAttribute();
+            });
+
+            $makeRevenue = $carGroup->whereIn('current_phase', ['sold'])->sum(function ($car) {
+                return $car->sale ? $car->sale->selling_price : 0;
+            });
+
+            $makeEstimatedValue = $carGroup->whereNotIn('current_phase', ['sold'])->sum('estimated_market_value');
+            $makePotentialValue = $makeRevenue + $makeEstimatedValue;
+            $makePotentialProfit = $makePotentialValue - $makeInvestment;
+
+            return [
+                'count' => $carGroup->count(),
+                'total_investment' => $makeInvestment,
+                'avg_investment' => $carGroup->count() > 0 ? $makeInvestment / $carGroup->count() : 0,
+                'revenue' => $makeRevenue,
+                'estimated_value' => $makeEstimatedValue,
+                'potential_value' => $makePotentialValue,
+                'potential_profit' => $makePotentialProfit,
+                'roi_percentage' => $makeInvestment > 0 ? ($makePotentialProfit / $makeInvestment) * 100 : 0,
+                'sold_count' => $carGroup->where('current_phase', 'sold')->count(),
+                'unsold_count' => $carGroup->whereNotIn('current_phase', ['sold'])->count(),
+            ];
+        })->sortByDesc('total_investment')->toArray();
+
+        // Prepare car details for the report
+        $carDetails = $cars->map(function ($car) {
+            $totalInvestment = $car->getTotalInvestmentAttribute();
+            $value = $car->current_phase === 'sold' && $car->sale ? $car->sale->selling_price : $car->estimated_market_value;
+            $profit = $value - $totalInvestment;
+            $roi = $totalInvestment > 0 ? ($profit / $totalInvestment) * 100 : 0;
+
+            return [
+                'id' => $car->id,
+                'year' => $car->year,
+                'make' => $car->make,
+                'model' => $car->model,
+                'vin' => $car->vin,
+                'status' => ucfirst($car->current_phase),
+                'purchase_date' => $car->purchase_date ? Carbon::parse($car->purchase_date)->format('Y-m-d') : null,
+                'sale_date' => $car->sale ? Carbon::parse($car->sale->sale_date)->format('Y-m-d') : null,
+                'days_owned' => $car->purchase_date ?
+                    ($car->sale ? Carbon::parse($car->purchase_date)->diffInDays(Carbon::parse($car->sale->sale_date)) :
+                    Carbon::parse($car->purchase_date)->diffInDays(Carbon::now())) : 0,
+                'purchase_price' => $car->purchase_price,
+                'repair_cost' => $car->getRepairCostAttribute(),
+                'other_costs' => $car->transportation_cost + $car->registration_papers_cost + $car->number_plates_cost + $car->other_costs,
+                'total_investment' => $totalInvestment,
+                'value' => $value,
+                'profit' => $profit,
+                'roi' => $roi,
+            ];
+        })->toArray();
+
+        // Calculate monthly investment and revenue trends
+        $monthlyTrends = $this->calculateMonthlyInvestmentTrends($cars);
+
         return [
             'investment_by_category' => [
                 'purchase' => $purchaseCost,
@@ -579,6 +746,8 @@ class ReportController extends Controller
                 'number_plates' => $numberPlatesCost,
                 'other' => $otherCosts,
             ],
+            'investment_by_make' => $investmentByMake,
+            'monthly_trends' => $monthlyTrends,
             'total_investment' => $totalInvestment,
             'total_revenue' => $totalRevenue,
             'estimated_value' => $estimatedValue,
@@ -589,6 +758,85 @@ class ReportController extends Controller
             'total_cars' => $cars->count(),
             'sold_cars' => $cars->where('current_phase', 'sold')->count(),
             'unsold_cars' => $cars->whereNotIn('current_phase', ['sold'])->count(),
+            'cars' => $carDetails,
         ];
+    }
+
+    /**
+     * Calculate monthly investment and revenue trends.
+     */
+    private function calculateMonthlyInvestmentTrends($cars)
+    {
+        $monthlyData = [];
+
+        // Process purchase investments by month
+        foreach ($cars as $car) {
+            if ($car->purchase_date) {
+                $month = Carbon::parse($car->purchase_date)->format('Y-m');
+
+                if (!isset($monthlyData[$month])) {
+                    $monthlyData[$month] = [
+                        'month_name' => Carbon::parse($car->purchase_date)->format('M Y'),
+                        'investment' => 0,
+                        'revenue' => 0,
+                        'net_flow' => 0,
+                        'cars_purchased' => 0,
+                        'cars_sold' => 0,
+                    ];
+                }
+
+                $monthlyData[$month]['investment'] += $car->purchase_price;
+                $monthlyData[$month]['cars_purchased']++;
+            }
+
+            // Add repair costs to the month they were incurred
+            foreach ($car->parts as $part) {
+                if ($part->purchase_date) {
+                    $month = Carbon::parse($part->purchase_date)->format('Y-m');
+
+                    if (!isset($monthlyData[$month])) {
+                        $monthlyData[$month] = [
+                            'month_name' => Carbon::parse($part->purchase_date)->format('M Y'),
+                            'investment' => 0,
+                            'revenue' => 0,
+                            'net_flow' => 0,
+                            'cars_purchased' => 0,
+                            'cars_sold' => 0,
+                        ];
+                    }
+
+                    $monthlyData[$month]['investment'] += $part->total_price;
+                }
+            }
+
+            // Process sales revenue by month
+            if ($car->sale && $car->sale->sale_date) {
+                $month = Carbon::parse($car->sale->sale_date)->format('Y-m');
+
+                if (!isset($monthlyData[$month])) {
+                    $monthlyData[$month] = [
+                        'month_name' => Carbon::parse($car->sale->sale_date)->format('M Y'),
+                        'investment' => 0,
+                        'revenue' => 0,
+                        'net_flow' => 0,
+                        'cars_purchased' => 0,
+                        'cars_sold' => 0,
+                    ];
+                }
+
+                $monthlyData[$month]['revenue'] += $car->sale->selling_price;
+                $monthlyData[$month]['cars_sold']++;
+            }
+        }
+
+        // Calculate net flow for each month
+        foreach ($monthlyData as &$data) {
+            $data['net_flow'] = $data['revenue'] - $data['investment'];
+        }
+
+        // Sort by month
+        ksort($monthlyData);
+
+        return array_values($monthlyData);
     }
 }

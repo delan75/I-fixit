@@ -173,6 +173,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the scheduled reports for the user.
+     */
+    public function scheduledReports()
+    {
+        return $this->hasMany(ScheduledReport::class);
+    }
+
+    /**
      * Get the notifications for the user.
      */
     public function notifications()
@@ -186,6 +194,14 @@ class User extends Authenticatable
     public function unreadNotifications()
     {
         return $this->notifications()->where('is_read', false);
+    }
+
+    /**
+     * Get the preferences for the user.
+     */
+    public function preferences()
+    {
+        return $this->hasOne(UserPreference::class);
     }
 
     /**

@@ -18,6 +18,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserPreferenceController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -61,6 +62,10 @@ Route::middleware('auth')->group(function () {
     Route::get('reports/{report}/export/pdf', [ReportController::class, 'exportPdf'])->name('reports.export.pdf');
     Route::get('reports/{report}/export/excel', [ReportController::class, 'exportExcel'])->name('reports.export.excel');
 
+    // Scheduled Report routes
+    Route::resource('scheduled-reports', ScheduledReportController::class);
+    Route::put('scheduled-reports/{scheduledReport}/toggle-active', [ScheduledReportController::class, 'toggleActive'])->name('scheduled-reports.toggle-active');
+
     // Notification routes
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('notifications/{notification}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
@@ -68,6 +73,11 @@ Route::middleware('auth')->group(function () {
     Route::get('notifications/unread-count', [NotificationController::class, 'getUnreadCount'])->name('notifications.unread-count');
     Route::get('notifications/recent', [NotificationController::class, 'getRecent'])->name('notifications.recent');
     Route::get('notifications/test', [TestNotificationController::class, 'sendTestNotification'])->name('notifications.test');
+
+    // User Preferences routes
+    Route::get('preferences', [UserPreferenceController::class, 'edit'])->name('preferences.edit');
+    Route::put('preferences', [UserPreferenceController::class, 'update'])->name('preferences.update');
+    Route::get('preferences/models', [UserPreferenceController::class, 'getModels'])->name('preferences.get-models');
 
     // Damaged Parts routes
     Route::get('cars/{car}/damaged-parts/create', [DamagedPartController::class, 'create'])->name('damaged_parts.create');
