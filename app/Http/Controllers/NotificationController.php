@@ -31,11 +31,23 @@ class NotificationController extends Controller
     /**
      * Display a listing of the user's notifications.
      *
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $notifications = Auth::user()->notifications()->orderBy('created_at', 'desc')->paginate(10);
+        $filter = $request->get('filter');
+        $query = Auth::user()->notifications();
+
+        // Apply filter if provided
+        if ($filter === 'unread') {
+            $query->where('is_read', false);
+        } elseif ($filter === 'read') {
+            $query->where('is_read', true);
+        }
+
+        // Get notifications with pagination
+        $notifications = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
         $unreadCount = Auth::user()->unreadNotifications()->count();
 
         return view('notifications.index', compact('notifications', 'unreadCount'));

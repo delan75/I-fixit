@@ -3,12 +3,31 @@
 namespace App\Http\Controllers;
 
 use App\Models\Car;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class CarController extends Controller
 {
+    /**
+     * The notification service instance.
+     *
+     * @var \App\Services\NotificationService
+     */
+    protected $notificationService;
+
+    /**
+     * Create a new controller instance.
+     *
+     * @param \App\Services\NotificationService $notificationService
+     * @return void
+     */
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->middleware('auth');
+        $this->notificationService = $notificationService;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -126,6 +145,15 @@ class CarController extends Controller
 
             // Create the car
             $car = Car::create($validated);
+
+            // Notify admins about the new car
+            $this->notificationService->notifyAdmins(
+                'created',
+                'car',
+                $car->id,
+                Auth::user(),
+                $car->year . ' ' . $car->make . ' ' . $car->model
+            );
         } else {
             // Add updated_by to the validated data
             $validated['updated_by'] = Auth::id();
@@ -325,6 +353,15 @@ class CarController extends Controller
             // Update the car with the validated data
             $car->update($validated);
 
+            // Notify admins about the car update
+            $this->notificationService->notifyAdmins(
+                'updated',
+                'car',
+                $car->id,
+                Auth::user(),
+                $car->year . ' ' . $car->make . ' ' . $car->model
+            );
+
             // Handle image uploads if any
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
@@ -396,6 +433,15 @@ class CarController extends Controller
 
         // Update the car
         $car->update($validated);
+
+        // Notify admins about the car update
+        $this->notificationService->notifyAdmins(
+            'updated',
+            'car',
+            $car->id,
+            Auth::user(),
+            $car->year . ' ' . $car->make . ' ' . $car->model
+        );
 
         // Handle image uploads if any
         if ($request->hasFile('images')) {

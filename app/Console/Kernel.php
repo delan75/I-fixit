@@ -14,6 +14,9 @@ class Kernel extends ConsoleKernel
     {
         // Run the scheduled reports command every minute
         $schedule->command('reports:generate-scheduled')->everyMinute();
+
+        // Run the car notifications check every hour
+        $schedule->command('app:check-car-notifications')->hourly();
     }
 
     /**
