@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('activity_logs', function (Blueprint $table) {
             $table->id();
-            $table->uuid('user_id')->nullable();
-            $table->foreign('user_id')->references('id')->on('users')->nullOnDelete();
+            $table->char('user_id', 36)->nullable();
             $table->string('activity_type');
             $table->text('description');
             $table->string('model_type')->nullable();
@@ -29,6 +28,9 @@ return new class extends Migration
             $table->index('user_id');
             $table->index('created_at');
         });
+
+        // Note: We're skipping the foreign key constraint for now
+        // You can add it later with a separate migration if needed
     }
 
     /**

@@ -15,7 +15,11 @@ return new class extends Migration
             $table->string('status')->default('active')->after('imageable_type');
             $table->uuid('created_by')->nullable()->after('status');
             $table->uuid('updated_by')->nullable()->after('created_by');
-            $table->softDeletes();
+
+            // Only add the deleted_at column if it doesn't already exist
+            if (!Schema::hasColumn('images', 'deleted_at')) {
+                $table->softDeletes();
+            }
         });
     }
 
@@ -26,7 +30,13 @@ return new class extends Migration
     {
         Schema::table('images', function (Blueprint $table) {
             $table->dropColumn(['status', 'created_by', 'updated_by']);
-            $table->dropSoftDeletes();
+
+            // Only drop the deleted_at column if it exists and we're responsible for it
+            // This is a bit tricky since we can't know if we added it or not
+            // So we'll just check if it exists
+            if (Schema::hasColumn('images', 'deleted_at')) {
+                $table->dropSoftDeletes();
+            }
         });
     }
 };

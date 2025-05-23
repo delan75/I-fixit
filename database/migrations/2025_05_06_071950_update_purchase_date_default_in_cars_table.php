@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
@@ -12,9 +10,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('cars', function (Blueprint $table) {
-            $table->date('purchase_date')->default(DB::raw('CURRENT_DATE'))->change(); // Set default to current date
-        });
+        // Instead of using change() with DB::raw, which causes issues,
+        // we'll use a different approach to set the default value
+        DB::statement('ALTER TABLE cars MODIFY purchase_date DATE DEFAULT CURRENT_DATE');
     }
 
     /**
@@ -22,8 +20,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('cars', function (Blueprint $table) {
-            $table->date('purchase_date')->default(null)->change(); // Remove default value
-        });
+        // Use direct SQL to remove the default value
+        DB::statement('ALTER TABLE cars MODIFY purchase_date DATE DEFAULT NULL');
     }
 };

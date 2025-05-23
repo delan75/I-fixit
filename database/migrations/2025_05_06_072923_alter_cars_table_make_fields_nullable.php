@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -11,14 +12,15 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Use direct SQL statements for modifying columns
+        // This avoids issues with Doctrine DBAL not supporting enum types
+
+        // Regular columns that don't use enum
         Schema::table('cars', function (Blueprint $table) {
             $table->decimal('purchase_price', 10, 2)->nullable()->change();
             $table->string('auction_house')->nullable()->change();
             $table->string('auction_lot_number')->nullable()->change();
             $table->text('damage_description')->nullable()->change();
-            $table->enum('damage_severity', ['light', 'moderate', 'severe'])->nullable()->change();
-            $table->enum('operational_status', ['running', 'non-running'])->nullable()->change();
-            $table->enum('current_phase', ['bidding', 'fixing', 'dealership', 'sold'])->nullable()->change();
             $table->date('repair_start_date')->nullable()->change();
             $table->date('repair_end_date')->nullable()->change();
             $table->date('dealership_date')->nullable()->change();
@@ -33,6 +35,11 @@ return new class extends Migration
             $table->decimal('estimated_market_value', 10, 2)->nullable()->change();
             $table->text('notes')->nullable()->change();
         });
+
+        // Use direct SQL for enum columns
+        DB::statement("ALTER TABLE cars MODIFY damage_severity ENUM('light', 'moderate', 'severe') NULL");
+        DB::statement("ALTER TABLE cars MODIFY operational_status ENUM('running', 'non-running') NULL");
+        DB::statement("ALTER TABLE cars MODIFY current_phase ENUM('bidding', 'fixing', 'dealership', 'sold') NULL");
     }
 
     /**

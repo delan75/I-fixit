@@ -44,6 +44,7 @@
                                         <option value="during_repair" {{ old('image_type') == 'during_repair' ? 'selected' : '' }}>{{ __('During Repair') }}</option>
                                         <option value="after_repair" {{ old('image_type') == 'after_repair' ? 'selected' : '' }}>{{ __('After Repair') }}</option>
                                         <option value="damage" {{ old('image_type') == 'damage' ? 'selected' : '' }}>{{ __('Damage') }}</option>
+                                        <option value="dealership" {{ old('image_type') == 'dealership' ? 'selected' : '' }}>{{ __('Dealership') }}</option>
                                         <option value="other" {{ old('image_type') == 'other' ? 'selected' : '' }}>{{ __('Other') }}</option>
                                     </select>
                                     <x-input-error :messages="$errors->get('image_type')" class="mt-2" />

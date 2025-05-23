@@ -11,6 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // First, check if report_types table exists, if not create it
+        if (!Schema::hasTable('report_types')) {
+            Schema::create('report_types', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('slug')->unique();
+                $table->string('description')->nullable();
+                $table->string('icon')->nullable();
+                $table->string('chart_type')->default('bar'); // bar, line, pie, etc.
+                $table->boolean('is_active')->default(true);
+                $table->timestamps();
+            });
+        }
+
+        // Now create the reports table
         Schema::create('reports', function (Blueprint $table) {
             $table->id();
             $table->foreignId('report_type_id')->constrained()->onDelete('cascade');
@@ -36,5 +51,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('reports');
+
+        // Don't drop the report_types table here, as it might be used by other migrations
+        // The original report_types migration will handle dropping it if needed
     }
 };

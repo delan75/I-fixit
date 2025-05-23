@@ -12,7 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->boolean('is_superuser')->default(false)->after('role');
+            // Check if the role column exists before trying to add after it
+            if (Schema::hasColumn('users', 'role')) {
+                $table->boolean('is_superuser')->default(false)->after('role');
+            } else {
+                // If role doesn't exist yet, add it after email
+                $table->boolean('is_superuser')->default(false)->after('email');
+            }
         });
     }
 

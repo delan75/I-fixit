@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\ReportType;
 use App\Models\ScheduledReport;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -295,7 +294,7 @@ class ScheduledReportController extends Controller
     }
 
     /**
-     * Toggle the active status of the specified resource.
+     * Toggle the active status of the scheduled report.
      */
     public function toggleActive(ScheduledReport $scheduledReport)
     {
@@ -305,9 +304,17 @@ class ScheduledReportController extends Controller
         }
 
         $scheduledReport->is_active = !$scheduledReport->is_active;
+
+        // If activating, recalculate the next run time
+        if ($scheduledReport->is_active) {
+            $scheduledReport->next_run_at = $scheduledReport->calculateNextRunTime();
+        }
+
         $scheduledReport->save();
 
+        $status = $scheduledReport->is_active ? 'activated' : 'deactivated';
+
         return redirect()->route('scheduled-reports.index')
-            ->with('success', 'Scheduled report ' . ($scheduledReport->is_active ? 'activated' : 'deactivated') . ' successfully.');
+            ->with('success', "Scheduled report {$status} successfully.");
     }
 }

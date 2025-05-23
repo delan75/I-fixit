@@ -145,6 +145,100 @@ This document outlines the user stories for the I-fixit car investment tracking 
 8. As an opportunity analyst, I want to view scraping logs so that I can troubleshoot issues
 9. As an opportunity analyst, I want to manually trigger scraping so that I can get immediate results
 
+## Analytics Dashboard User Stories
+
+### Dashboard Management
+1. As a manager, I want to view profit trends over time so that I can identify seasonal patterns
+2. As a manager, I want to see predictive models for optimal selling times so that I can maximize profits
+3. As a manager, I want to compare repair costs against industry benchmarks so that I can identify inefficiencies
+4. As a manager, I want to analyze ROI across different makes/models/years so that I can optimize purchasing decisions
+5. As a manager, I want to customize my analytics dashboard so that I can focus on metrics that matter to me
+
+### Analytics Features
+6. As a manager, I want to export analytics data in multiple formats so that I can use it in presentations
+7. As a manager, I want to track historical performance of completed investments so that I can identify successful strategies
+8. As a manager, I want to see confidence scores for predictions so that I can assess reliability
+9. As a manager, I want to filter analytics by date ranges so that I can focus on specific periods
+10. As a manager, I want to share analytics insights with team members so that we can align our strategies
+
+## Supplier Marketplace User Stories
+
+### Supplier Management
+1. As a supplier, I want to register on the marketplace so that I can sell parts
+2. As a supplier, I want to manage my business profile so that customers can find me
+3. As a supplier, I want to list parts with detailed information so that customers know what I offer
+4. As a supplier, I want to set pricing for my parts so that I can be competitive
+5. As a supplier, I want to manage my inventory so that I don't oversell
+
+### Parts Ordering
+6. As a repair staff, I want to search for parts by compatibility so that I find what fits my cars
+7. As a repair staff, I want to compare prices from multiple suppliers so that I get the best deal
+8. As a repair staff, I want to order parts directly through the system so that I can streamline procurement
+9. As a repair staff, I want to track my orders so that I know when parts will arrive
+10. As a repair staff, I want to rate suppliers after purchases so that others know about quality
+
+### Marketplace Features
+11. As a supplier, I want to offer volume discounts so that I can encourage larger orders
+12. As a supplier, I want to view marketplace analytics so that I can optimize my offerings
+13. As a supplier, I want to respond to customer inquiries so that I can provide good service
+14. As a supplier, I want to see my ratings and reviews so that I can improve my service
+15. As a supplier, I want to participate in bidding for parts requests so that I can win more business
+
+## Public Car Listing User Stories
+
+### Listing Management
+1. As dealership staff, I want cars in the dealership phase to be automatically listed publicly so that potential buyers can find them
+2. As dealership staff, I want to customize public listing details so that I can highlight selling points
+3. As dealership staff, I want to manage listing photos so that cars look attractive to buyers
+4. As dealership staff, I want to set pricing and negotiation options so that I can maximize sales
+5. As dealership staff, I want to feature certain listings so that they get more visibility
+
+### Public Interface
+6. As a public user, I want to search for cars by various criteria so that I can find what I'm looking for
+7. As a public user, I want to view detailed car specifications so that I can make informed decisions
+8. As a public user, I want to see high-quality images of cars so that I can assess their condition
+9. As a public user, I want to submit inquiries about listings so that I can get more information
+10. As a public user, I want to save favorite listings so that I can come back to them later
+
+### Listing Analytics
+11. As dealership staff, I want to track view counts for listings so that I know which are popular
+12. As dealership staff, I want to see inquiry statistics so that I can gauge interest levels
+13. As dealership staff, I want to receive notifications about new inquiries so that I can respond quickly
+14. As dealership staff, I want to optimize listings for search engines so that they reach more potential buyers
+15. As dealership staff, I want to compare my listings with market averages so that I can price competitively
+
+## Auction Integration User Stories
+
+### Auction Management
+1. As a manager, I want to integrate with major auction platforms so that I can access more opportunities
+2. As a manager, I want to import auction listings automatically so that I don't miss opportunities
+3. As a manager, I want to manage bids directly from I-fixit so that I can streamline the process
+4. As a manager, I want to see opportunity scores for auction listings so that I can prioritize bidding
+5. As a manager, I want to set maximum bid amounts so that I don't exceed my budget
+
+### Auction Features
+6. As a manager, I want to receive notifications about outbid situations so that I can decide whether to increase my bid
+7. As a manager, I want to track auction history so that I can analyze patterns
+8. As a manager, I want to streamline the purchase workflow for winning bids so that I can quickly process acquisitions
+9. As a manager, I want to incorporate auction data into analytics so that I can improve bidding strategies
+10. As a manager, I want to track success rates for auction purchases so that I can evaluate performance
+
+## Document Generation User Stories
+
+### Document Management
+1. As a manager, I want to generate sales contracts automatically so that I can standardize documentation
+2. As a manager, I want to create repair authorization documents so that I have proper approval records
+3. As a manager, I want to implement electronic signatures so that I can complete transactions remotely
+4. As a manager, I want to maintain document version history so that I can track changes
+5. As a manager, I want to store documents securely so that sensitive information is protected
+
+### Document Features
+6. As a manager, I want to customize document templates so that they meet specific needs
+7. As a manager, I want to ensure compliance with legal requirements so that documents are valid
+8. As a manager, I want to share documents with appropriate parties so that they can review and sign
+9. As a manager, I want to track document status so that I know what needs attention
+10. As a manager, I want to support multiple signatories so that I can handle complex transactions
+
 ## Implementation Priority
 
 The user stories will be implemented in the following priority order:
@@ -173,3 +267,23 @@ The user stories will be implemented in the following priority order:
 - Admin: Integration Management (13-15)
 - Viewer: All stories (1-8)
 - Opportunity Analyst: All stories (future phase)
+
+### Phase 5: Analytics Dashboard
+- Analytics Dashboard: Dashboard Management (1-5)
+- Analytics Dashboard: Analytics Features (6-10)
+
+### Phase 6: Supplier Marketplace and Public Listings
+- Supplier Marketplace: Supplier Management (1-5)
+- Supplier Marketplace: Parts Ordering (6-10)
+- Supplier Marketplace: Marketplace Features (11-15)
+- Public Car Listing: Listing Management (1-5)
+- Public Car Listing: Public Interface (6-10)
+- Public Car Listing: Listing Analytics (11-15)
+
+### Phase 7: Auction Integration
+- Auction Integration: Auction Management (1-5)
+- Auction Integration: Auction Features (6-10)
+
+### Phase 8: Document Generation
+- Document Generation: Document Management (1-5)
+- Document Generation: Document Features (6-10)

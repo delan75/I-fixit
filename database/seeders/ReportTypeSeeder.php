@@ -53,7 +53,11 @@ class ReportTypeSeeder extends Seeder
         ];
 
         foreach ($reportTypes as $reportType) {
-            ReportType::create($reportType);
+            // Check if report type already exists
+            $exists = ReportType::where('slug', $reportType['slug'])->exists();
+            if (!$exists) {
+                ReportType::create($reportType);
+            }
         }
     }
 }

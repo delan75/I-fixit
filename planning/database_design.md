@@ -313,6 +313,266 @@ activity_log
 - Index on `opportunities.status` for filtering by status
 - Index on `notifications.user_id` and `notifications.read_at` for faster retrieval of unread notifications
 
+## Additional Tables for New Features
+
+### 1. Analytics Dashboard
+
+```
+analytics_widgets
+- id (primary key)
+- user_id (foreign key to users)
+- widget_type (enum: profit_trend, repair_cost, roi_comparison, selling_time, custom)
+- title (string)
+- description (text, nullable)
+- settings (json) - For widget-specific configuration
+- position (integer) - For ordering on dashboard
+- size (enum: small, medium, large)
+- is_active (boolean)
+- created_at (timestamp)
+- updated_at (timestamp)
+```
+
+```
+analytics_data_points
+- id (primary key)
+- data_type (enum: profit, cost, roi, time, custom)
+- reference_id (string) - ID of the referenced entity (car, make, model, etc.)
+- reference_type (string) - Type of the referenced entity
+- value (decimal)
+- date (date)
+- metadata (json, nullable) - Additional contextual data
+- created_at (timestamp)
+- updated_at (timestamp)
+```
+
+```
+predictive_models
+- id (primary key)
+- model_type (enum: selling_time, price_prediction, repair_cost, roi)
+- name (string)
+- description (text, nullable)
+- parameters (json) - Model parameters
+- accuracy (decimal, nullable)
+- last_trained (timestamp, nullable)
+- is_active (boolean)
+- created_at (timestamp)
+- updated_at (timestamp)
+```
+
+### 2. Supplier Marketplace
+
+```
+suppliers_marketplace
+- id (primary key)
+- supplier_id (foreign key to suppliers)
+- business_name (string)
+- business_description (text, nullable)
+- logo_path (string, nullable)
+- website (string, nullable)
+- business_hours (json, nullable)
+- rating (decimal, nullable)
+- is_verified (boolean)
+- status (enum: active, inactive, suspended)
+- created_at (timestamp)
+- updated_at (timestamp)
+```
+
+```
+supplier_parts
+- id (primary key)
+- supplier_id (foreign key to suppliers)
+- part_name (string)
+- part_number (string, nullable)
+- description (text, nullable)
+- condition (enum: new, used, refurbished)
+- price (decimal)
+- quantity_available (integer)
+- compatible_makes (json, nullable)
+- compatible_models (json, nullable)
+- compatible_years (json, nullable)
+- image_path (string, nullable)
+- is_featured (boolean)
+- status (enum: active, inactive, out_of_stock)
+- created_at (timestamp)
+- updated_at (timestamp)
+```
+
+```
+part_orders
+- id (primary key)
+- user_id (foreign key to users)
+- supplier_id (foreign key to suppliers)
+- car_id (foreign key to cars, nullable)
+- order_number (string)
+- status (enum: pending, approved, shipped, delivered, cancelled)
+- total_amount (decimal)
+- shipping_address (text, nullable)
+- shipping_cost (decimal, nullable)
+- tracking_number (string, nullable)
+- notes (text, nullable)
+- created_at (timestamp)
+- updated_at (timestamp)
+```
+
+```
+order_items
+- id (primary key)
+- order_id (foreign key to part_orders)
+- supplier_part_id (foreign key to supplier_parts)
+- quantity (integer)
+- unit_price (decimal)
+- total_price (decimal)
+- status (enum: pending, shipped, delivered, returned)
+- created_at (timestamp)
+- updated_at (timestamp)
+```
+
+```
+supplier_reviews
+- id (primary key)
+- user_id (foreign key to users)
+- supplier_id (foreign key to suppliers)
+- order_id (foreign key to part_orders, nullable)
+- rating (integer) - 1 to 5
+- review_text (text, nullable)
+- is_verified_purchase (boolean)
+- created_at (timestamp)
+- updated_at (timestamp)
+```
+
+### 3. Public Car Listings
+
+```
+public_car_listings
+- id (primary key)
+- car_id (foreign key to cars)
+- title (string)
+- description (text)
+- price (decimal)
+- is_negotiable (boolean)
+- contact_name (string)
+- contact_email (string, nullable)
+- contact_phone (string, nullable)
+- location (string)
+- is_featured (boolean)
+- views_count (integer)
+- status (enum: active, sold, inactive)
+- created_at (timestamp)
+- updated_at (timestamp)
+```
+
+```
+listing_inquiries
+- id (primary key)
+- listing_id (foreign key to public_car_listings)
+- name (string)
+- email (string)
+- phone (string, nullable)
+- message (text)
+- status (enum: new, read, replied, spam)
+- created_at (timestamp)
+- updated_at (timestamp)
+```
+
+### 4. Auction Integration
+
+```
+auction_platforms
+- id (primary key)
+- name (string)
+- api_endpoint (string, nullable)
+- api_key (string, nullable)
+- api_secret (string, nullable)
+- status (enum: active, inactive)
+- created_at (timestamp)
+- updated_at (timestamp)
+```
+
+```
+auction_listings
+- id (primary key)
+- platform_id (foreign key to auction_platforms)
+- external_id (string) - ID from the auction platform
+- title (string)
+- description (text, nullable)
+- make (string)
+- model (string)
+- year (integer, nullable)
+- vin (string, nullable)
+- color (string, nullable)
+- mileage (integer, nullable)
+- damage_description (text, nullable)
+- starting_bid (decimal, nullable)
+- current_bid (decimal, nullable)
+- estimated_value (decimal, nullable)
+- auction_start (timestamp, nullable)
+- auction_end (timestamp, nullable)
+- location (string, nullable)
+- images (json, nullable) - Array of image URLs
+- opportunity_score (integer, nullable) - 0 to 100
+- status (enum: upcoming, active, ended, purchased, passed)
+- created_at (timestamp)
+- updated_at (timestamp)
+```
+
+```
+auction_bids
+- id (primary key)
+- user_id (foreign key to users)
+- listing_id (foreign key to auction_listings)
+- amount (decimal)
+- max_bid (decimal, nullable) - For auto-bidding
+- status (enum: active, outbid, won, lost)
+- created_at (timestamp)
+- updated_at (timestamp)
+```
+
+### 5. Document Generation and E-Signing
+
+```
+document_templates
+- id (primary key)
+- name (string)
+- description (text, nullable)
+- type (enum: sales_contract, repair_authorization, invoice, receipt, other)
+- content (text) - HTML template with placeholders
+- created_by (foreign key to users)
+- is_active (boolean)
+- created_at (timestamp)
+- updated_at (timestamp)
+```
+
+```
+generated_documents
+- id (primary key)
+- template_id (foreign key to document_templates)
+- user_id (foreign key to users) - Who generated it
+- reference_id (string) - ID of the referenced entity (car, order, etc.)
+- reference_type (string) - Type of the referenced entity
+- title (string)
+- file_path (string)
+- version (integer)
+- status (enum: draft, final, signed, voided)
+- created_at (timestamp)
+- updated_at (timestamp)
+```
+
+```
+document_signatures
+- id (primary key)
+- document_id (foreign key to generated_documents)
+- signer_name (string)
+- signer_email (string)
+- signer_role (string, nullable)
+- signature_image (string, nullable) - Path to signature image
+- ip_address (string, nullable)
+- signed_at (timestamp, nullable)
+- verification_code (string, nullable)
+- status (enum: pending, signed, rejected, expired)
+- created_at (timestamp)
+- updated_at (timestamp)
+```
+
 ## Views
 
 ### 1. Car Investment Summary View
@@ -346,6 +606,47 @@ profit_by_make_model
 - avg_selling_price
 - avg_profit
 - avg_roi
+```
+
+### 3. Analytics Dashboard Views
+
+```
+repair_cost_benchmarks
+- make
+- model
+- year_range
+- damage_severity
+- avg_parts_cost
+- avg_labor_cost
+- avg_painting_cost
+- avg_total_repair_cost
+- sample_size
+```
+
+```
+selling_time_predictions
+- make
+- model
+- year_range
+- price_range
+- condition
+- avg_days_at_dealership
+- optimal_price_range
+- confidence_score
+- sample_size
+```
+
+```
+roi_comparison
+- make
+- model
+- year
+- avg_purchase_price
+- avg_repair_cost
+- avg_selling_price
+- avg_roi
+- market_comparison
+- sample_size
 ```
 
 ## Database Migrations

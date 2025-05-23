@@ -16,6 +16,7 @@ use App\Http\Controllers\PaintingController;
 use App\Http\Controllers\PartController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\ScheduledReportController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPreferenceController;
@@ -56,6 +57,7 @@ Route::middleware('auth')->group(function () {
     Route::get('cars/{car}/images/create', [CarImageController::class, 'create'])->name('car_images.create');
     Route::post('cars/{car}/images', [CarImageController::class, 'store'])->name('car_images.store');
     Route::delete('cars/{car}/images/{image}', [CarImageController::class, 'destroy'])->name('car_images.destroy');
+    Route::post('cars/{car}/images/migrate', [CarImageController::class, 'migrateImages'])->name('car_images.migrate');
 
     // Report routes
     Route::resource('reports', ReportController::class);
@@ -92,11 +94,13 @@ Route::middleware('auth')->group(function () {
     Route::put('suppliers/{supplier}/restore', [SupplierController::class, 'restore'])->name('suppliers.restore');
 
     // Parts routes
-    Route::get('cars/{car}/parts/create', [PartController::class, 'create'])->name('parts.create');
-    Route::post('cars/{car}/parts', [PartController::class, 'store'])->name('parts.store');
-    Route::get('cars/{car}/parts/{part}/edit', [PartController::class, 'edit'])->name('parts.edit');
-    Route::put('cars/{car}/parts/{part}', [PartController::class, 'update'])->name('parts.update');
-    Route::delete('cars/{car}/parts/{part}', [PartController::class, 'destroy'])->name('parts.destroy');
+    Route::middleware(['phase.transition'])->group(function () {
+        Route::get('cars/{car}/parts/create', [PartController::class, 'create'])->name('parts.create');
+        Route::post('cars/{car}/parts', [PartController::class, 'store'])->name('parts.store');
+        Route::get('cars/{car}/parts/{part}/edit', [PartController::class, 'edit'])->name('parts.edit');
+        Route::put('cars/{car}/parts/{part}', [PartController::class, 'update'])->name('parts.update');
+        Route::delete('cars/{car}/parts/{part}', [PartController::class, 'destroy'])->name('parts.destroy');
+    });
 
     // Labor routes
     Route::get('cars/{car}/labor/create', [LaborController::class, 'create'])->name('labor.create');
@@ -113,18 +117,22 @@ Route::middleware('auth')->group(function () {
     Route::delete('cars/{car}/painting/{painting}', [PaintingController::class, 'destroy'])->name('painting.destroy');
 
     // Sale routes
-    Route::get('cars/{car}/sale/create', [SaleController::class, 'create'])->name('sales.create');
-    Route::post('cars/{car}/sale', [SaleController::class, 'store'])->name('sales.store');
-    Route::get('cars/{car}/sale/{sale}/edit', [SaleController::class, 'edit'])->name('sales.edit');
-    Route::put('cars/{car}/sale/{sale}', [SaleController::class, 'update'])->name('sales.update');
-    Route::delete('cars/{car}/sale/{sale}', [SaleController::class, 'destroy'])->name('sales.destroy');
+    Route::middleware(['phase.transition'])->group(function () {
+        Route::get('cars/{car}/sale/create', [SaleController::class, 'create'])->name('sales.create');
+        Route::post('cars/{car}/sale', [SaleController::class, 'store'])->name('sales.store');
+        Route::get('cars/{car}/sale/{sale}/edit', [SaleController::class, 'edit'])->name('sales.edit');
+        Route::put('cars/{car}/sale/{sale}', [SaleController::class, 'update'])->name('sales.update');
+        Route::delete('cars/{car}/sale/{sale}', [SaleController::class, 'destroy'])->name('sales.destroy');
+    });
 
     // Dealership routes
     Route::get('dealership', [DealershipController::class, 'index'])->name('dealership.index');
-    Route::get('dealership/cars/{car}/record-sale', [DealershipController::class, 'recordSale'])->name('dealership.record-sale');
-    Route::post('dealership/cars/{car}/record-sale', [DealershipController::class, 'storeSale'])->name('dealership.store-sale');
-    Route::get('dealership/cars/{car}/edit-discount', [DealershipController::class, 'editDiscount'])->name('dealership.edit-discount');
-    Route::post('dealership/cars/{car}/update-discount', [DealershipController::class, 'updateDiscount'])->name('dealership.update-discount');
+    Route::middleware(['phase.transition'])->group(function () {
+        Route::get('dealership/cars/{car}/record-sale', [DealershipController::class, 'recordSale'])->name('dealership.record-sale');
+        Route::post('dealership/cars/{car}/record-sale', [DealershipController::class, 'storeSale'])->name('dealership.store-sale');
+        Route::get('dealership/cars/{car}/edit-discount', [DealershipController::class, 'editDiscount'])->name('dealership.edit-discount');
+        Route::post('dealership/cars/{car}/update-discount', [DealershipController::class, 'updateDiscount'])->name('dealership.update-discount');
+    });
 
     // User management routes (admin only)
     Route::middleware(['admin', 'sensitive:10,1'])->group(function () {
@@ -161,3 +169,4 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+

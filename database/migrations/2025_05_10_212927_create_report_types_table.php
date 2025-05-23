@@ -11,16 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('report_types', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('slug')->unique();
-            $table->string('description')->nullable();
-            $table->string('icon')->nullable();
-            $table->string('chart_type')->default('bar'); // bar, line, pie, etc.
-            $table->boolean('is_active')->default(true);
-            $table->timestamps();
-        });
+        // Only create the table if it doesn't already exist
+        if (!Schema::hasTable('report_types')) {
+            Schema::create('report_types', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('slug')->unique();
+                $table->string('description')->nullable();
+                $table->string('icon')->nullable();
+                $table->string('chart_type')->default('bar'); // bar, line, pie, etc.
+                $table->boolean('is_active')->default(true);
+                $table->timestamps();
+            });
+        }
     }
 
     /**

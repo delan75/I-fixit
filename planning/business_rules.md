@@ -71,6 +71,65 @@ I-fixit is a car investment tracking system designed to monitor the lifecycle of
 3. Financial records cannot be deleted, only marked as void if necessary
 4. All void or modified financial entries must maintain an audit trail
 
+## Advanced Analytics Rules
+1. The analytics dashboard must provide visual representations of profit trends over time
+2. The system must implement predictive models for determining optimal selling times
+3. Repair cost benchmarking must compare costs against industry standards and historical data
+4. ROI comparison must be available across different makes, models, and years
+5. Users must be able to customize their analytics dashboard with relevant widgets
+6. Analytics data must be exportable in multiple formats (PDF, Excel, CSV)
+7. Historical performance tracking must be available for all completed car investments
+8. Predictive models must be regularly updated with new data to maintain accuracy
+9. Confidence scores must be displayed for all predictions to indicate reliability
+
+## Supplier Marketplace Rules
+1. The marketplace must allow suppliers to register and manage their profiles
+2. Suppliers must be able to list parts with detailed information and pricing
+3. Users must be able to order parts directly through the system
+4. The system must support supplier bidding for competitive pricing
+5. Order tracking must be available from placement to delivery
+6. Supplier ratings and reviews must be based on verified purchases
+7. Volume discounts must be configurable by suppliers
+8. The system must provide marketplace analytics for suppliers
+9. Parts must be searchable by compatibility with specific car makes, models, and years
+10. The system must enforce inventory management to prevent ordering unavailable parts
+
+## Public Car Listing Rules
+1. Cars in the "dealership" phase must be automatically listed on the public marketplace
+2. Public listings must not reveal repair history or internal investment details
+3. The public interface must include advanced search functionality similar to AutoTrader
+4. Inquiries from potential buyers must be routed to the appropriate user
+5. Public listings must include high-quality images and detailed specifications
+6. SEO optimization must be applied to public listings for better visibility
+7. View counts and engagement metrics must be tracked for each listing
+8. Featured listings must be prominently displayed in search results
+9. Contact information must be protected to prevent spam
+10. The system must support negotiable and fixed price options
+
+## Auction Integration Rules
+1. The system must integrate with major auction platforms via API
+2. Auction listings must be automatically imported and categorized
+3. Bid management must be available directly from the I-fixit interface
+4. Automatic opportunity scoring must be applied to all imported listings
+5. The purchase workflow must be streamlined for winning bids
+6. Auction history must be tracked for analysis and future reference
+7. Users must be able to set maximum bid amounts for auto-bidding
+8. The system must provide notifications for outbid situations and auction endings
+9. Auction data must be incorporated into analytics and predictive models
+10. The system must track success rates for auction purchases
+
+## Document Generation and E-Signing Rules
+1. The system must generate standardized documents from templates
+2. Sales contracts must include all legally required information
+3. Repair authorizations must detail all planned work and estimated costs
+4. Electronic signatures must be legally binding and compliant with regulations
+5. Document versioning must maintain a history of all changes
+6. Document storage must be secure and accessible only to authorized users
+7. Compliance verification must ensure all required fields are completed
+8. Document sharing must respect user permissions and privacy
+9. Templates must be customizable by administrators
+10. The system must support multiple signatories for complex documents
+
 ## Future Integration Rules (for Python Microservice)
 1. The system must provide API endpoints for the Python service to:
    - Retrieve historical car data for analysis

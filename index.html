@@ -1,0 +1,45 @@
+<input type="text" id="searchInput" placeholder="Search...">
+<table id="myTable">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Age</th>
+      <th>City</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>John Doe</td>
+      <td>30</td>
+      <td>New York</td>
+    </tr>
+    <tr>
+      <td>Jane Smith</td>
+      <td>25</td>
+      <td>London</td>
+    </tr>
+    <tr>
+      <td>Peter Jones</td>
+      <td>40</td>
+      <td>Paris</td>
+    </tr>
+  </tbody>
+</table>
+
+<script>
+  const searchInput = document.getElementById("searchInput");
+  const table = document.getElementById("myTable");
+  const rows = table.getElementsByTagName("tr");
+
+  searchInput.addEventListener("keyup", function() {
+    const searchTerm = searchInput.value.toLowerCase();
+    for (let i = 1; i < rows.length; i++) { // Start from 1 to skip header row
+      let rowData = rows[i].textContent.toLowerCase();
+      if (rowData.includes(searchTerm)) {
+        rows[i].style.display = "";
+      } else {
+        rows[i].style.display = "none";
+      }
+    }
+  });
+</script>

@@ -69,5 +69,6 @@ class Kernel extends HttpKernel
         'admin' => \App\Http\Middleware\AdminAccess::class,
         'superuser' => \App\Http\Middleware\SuperuserAccess::class,
         'sensitive' => \App\Http\Middleware\RateLimitSensitiveActions::class,
+        'phase.transition' => \App\Http\Middleware\PhaseTransitionMiddleware::class,
     ];
 }
