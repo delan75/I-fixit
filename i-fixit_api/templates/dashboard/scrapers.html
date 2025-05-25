@@ -1,0 +1,314 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Scrapers - I-fixit{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Scrapers</h1>
+    </div>
+
+    <!-- Auction Sites Card -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Auction Sites</h6>
+        </div>
+        <div class="card-body">
+            {% if auction_sites %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>URL</th>
+                            <th>Scraper Class</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for site in auction_sites %}
+                        <tr>
+                            <td>{{ site.name }}</td>
+                            <td>
+                                <a href="{{ site.url }}" target="_blank">{{ site.url }}</a>
+                            </td>
+                            <td>{{ site.get_scraper_class_display }}</td>
+                            <td>
+                                {% if site.is_active %}
+                                <span class="badge bg-success">Active</span>
+                                {% else %}
+                                <span class="badge bg-danger">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <form method="post" action="{% url 'dashboard:run_scraper' site.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-play"></i> Run Scraper
+                                    </button>
+                                </form>
+                                <button type="button" class="btn btn-success btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#preferencesModal{{ site.id }}">
+                                    <i class="fas fa-filter"></i> Run with Preferences
+                                </button>
+
+                                <!-- Preferences Modal -->
+                                <div class="modal fade" id="preferencesModal{{ site.id }}" tabindex="-1" aria-labelledby="preferencesModalLabel{{ site.id }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="preferencesModalLabel{{ site.id }}">Run {{ site.name }} with Preferences</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form id="preferencesForm{{ site.id }}" method="post" action="{% url 'dashboard:run_scraper_with_preferences' site.id %}">
+                                                    {% csrf_token %}
+
+                                                    <div class="row mb-3">
+                                                        <div class="col-12">
+                                                            <h6 class="fw-bold">Basic Vehicle Preferences</h6>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label for="preferred_makes{{ site.id }}" class="form-label">Preferred Makes</label>
+                                                            <select class="form-select" id="preferred_makes{{ site.id }}" name="preferred_makes" multiple>
+                                                                <option value="Toyota">Toyota</option>
+                                                                <option value="Honda">Honda</option>
+                                                                <option value="Volkswagen">Volkswagen</option>
+                                                                <option value="BMW">BMW</option>
+                                                                <option value="Mercedes">Mercedes</option>
+                                                                <option value="Audi">Audi</option>
+                                                                <option value="Nissan">Nissan</option>
+                                                                <option value="Ford">Ford</option>
+                                                                <option value="Hyundai">Hyundai</option>
+                                                                <option value="Kia">Kia</option>
+                                                            </select>
+                                                            <small class="form-text text-muted">Hold Ctrl/Cmd to select multiple</small>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label for="preferred_models{{ site.id }}" class="form-label">Preferred Models</label>
+                                                            <input type="text" class="form-control" id="preferred_models{{ site.id }}" name="preferred_models" placeholder="E.g. Corolla, Civic, Golf">
+                                                            <small class="form-text text-muted">Comma-separated list</small>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-6">
+                                                            <label for="min_year{{ site.id }}" class="form-label">Min Year</label>
+                                                            <input type="number" class="form-control" id="min_year{{ site.id }}" name="min_year" min="1990" max="2025">
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label for="max_year{{ site.id }}" class="form-label">Max Year</label>
+                                                            <input type="number" class="form-control" id="max_year{{ site.id }}" name="max_year" min="1990" max="2025">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row mb-3">
+                                                        <div class="col-12">
+                                                            <h6 class="fw-bold">Vehicle Condition Preferences</h6>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label for="preferred_vehicle_codes{{ site.id }}" class="form-label">Vehicle Codes</label>
+                                                            <select class="form-select" id="preferred_vehicle_codes{{ site.id }}" name="preferred_vehicle_codes" multiple>
+                                                                <option value="1">Code 1 - New Vehicle</option>
+                                                                <option value="2">Code 2 - Used Vehicle</option>
+                                                                <option value="3">Code 3 - Rebuilt Vehicle</option>
+                                                                <option value="4">Code 4 - Permanently Unfit</option>
+                                                            </select>
+                                                            <small class="form-text text-muted">Hold Ctrl/Cmd to select multiple</small>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-check mb-2">
+                                                                <input class="form-check-input" type="checkbox" id="require_keys{{ site.id }}" name="require_keys">
+                                                                <label class="form-check-label" for="require_keys{{ site.id }}">
+                                                                    Require Keys
+                                                                </label>
+                                                            </div>
+                                                            <div class="form-check mb-2">
+                                                                <input class="form-check-input" type="checkbox" id="require_spare_key{{ site.id }}" name="require_spare_key">
+                                                                <label class="form-check-label" for="require_spare_key{{ site.id }}">
+                                                                    Require Spare Key
+                                                                </label>
+                                                            </div>
+                                                            <div class="form-check mb-2">
+                                                                <input class="form-check-input" type="checkbox" id="require_starts{{ site.id }}" name="require_starts">
+                                                                <label class="form-check-label" for="require_starts{{ site.id }}">
+                                                                    Require Vehicle Starts
+                                                                </label>
+                                                            </div>
+                                                            <div class="form-check mb-2">
+                                                                <input class="form-check-input" type="checkbox" id="require_battery{{ site.id }}" name="require_battery">
+                                                                <label class="form-check-label" for="require_battery{{ site.id }}">
+                                                                    Require Battery
+                                                                </label>
+                                                            </div>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" id="require_spare_wheel{{ site.id }}" name="require_spare_wheel">
+                                                                <label class="form-check-label" for="require_spare_wheel{{ site.id }}">
+                                                                    Require Spare Wheel
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row mb-3">
+                                                        <div class="col-12">
+                                                            <h6 class="fw-bold">Financial Preferences</h6>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label for="min_profit{{ site.id }}" class="form-label">Min Profit (R)</label>
+                                                            <input type="number" class="form-control" id="min_profit{{ site.id }}" name="min_profit" min="0">
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label for="max_investment{{ site.id }}" class="form-label">Max Investment (R)</label>
+                                                            <input type="number" class="form-control" id="max_investment{{ site.id }}" name="max_investment" min="0">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row mb-3">
+                                                        <div class="col-12">
+                                                            <h6 class="fw-bold">Mileage Preferences</h6>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label for="max_mileage{{ site.id }}" class="form-label">Max Mileage (km)</label>
+                                                            <input type="number" class="form-control" id="max_mileage{{ site.id }}" name="max_mileage" min="0">
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label for="max_annual_mileage{{ site.id }}" class="form-label">Max Annual Mileage (km)</label>
+                                                            <input type="number" class="form-control" id="max_annual_mileage{{ site.id }}" name="max_annual_mileage" min="0">
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="button" class="btn btn-primary" id="runScraperBtn{{ site.id }}" onclick="runScraperWithPreferences({{ site.id }})">
+                                                    <span class="spinner-border spinner-border-sm d-none" id="spinner{{ site.id }}" role="status" aria-hidden="true"></span>
+                                                    <span id="btnText{{ site.id }}">Run Scraper</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center">No auction sites found.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Scraping Jobs Card -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Scraping Jobs</h6>
+        </div>
+        <div class="card-body">
+            {% if scraping_jobs %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Auction Site</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Opportunities Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for job in scraping_jobs %}
+                        <tr>
+                            <td>{{ job.id }}</td>
+                            <td>{{ job.auction_site.name }}</td>
+                            <td>
+                                {% if job.status == 'pending' %}
+                                <span class="badge bg-secondary">Pending</span>
+                                {% elif job.status == 'running' %}
+                                <span class="badge bg-primary">Running</span>
+                                {% elif job.status == 'completed' %}
+                                <span class="badge bg-success">Completed</span>
+                                {% elif job.status == 'failed' %}
+                                <span class="badge bg-danger">Failed</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ job.created_at|date:"M d, Y H:i" }}</td>
+                            <td>{% if job.start_time %}{{ job.start_time|date:"M d, Y H:i" }}{% else %}N/A{% endif %}</td>
+                            <td>{% if job.end_time %}{{ job.end_time|date:"M d, Y H:i" }}{% else %}N/A{% endif %}</td>
+                            <td>{{ job.opportunities_created }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center">No scraping jobs found.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Error Messages Card -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Recent Error Messages</h6>
+        </div>
+        <div class="card-body">
+            {% if scraping_jobs %}
+            <div class="accordion" id="errorAccordion">
+                {% for job in scraping_jobs %}
+                {% if job.error_message %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading{{ job.id }}">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ job.id }}" aria-expanded="false" aria-controls="collapse{{ job.id }}">
+                            Error in job #{{ job.id }} ({{ job.auction_site.name }}) - {{ job.created_at|date:"M d, Y H:i" }}
+                        </button>
+                    </h2>
+                    <div id="collapse{{ job.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ job.id }}" data-bs-parent="#errorAccordion">
+                        <div class="accordion-body">
+                            <pre class="bg-light p-3">{{ job.error_message }}</pre>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-center">No error messages found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function runScraperWithPreferences(siteId) {
+        // Show spinner and disable button
+        const spinner = document.getElementById(`spinner${siteId}`);
+        const btnText = document.getElementById(`btnText${siteId}`);
+        const runBtn = document.getElementById(`runScraperBtn${siteId}`);
+
+        spinner.classList.remove('d-none');
+        btnText.textContent = 'Running...';
+        runBtn.disabled = true;
+
+        // Submit the form
+        const form = document.getElementById(`preferencesForm${siteId}`);
+        form.submit();
+
+        // Close the modal after a short delay
+        setTimeout(() => {
+            const modal = bootstrap.Modal.getInstance(document.getElementById(`preferencesModal${siteId}`));
+            if (modal) {
+                modal.hide();
+            }
+        }, 500);
+    }
+</script>
+{% endblock %}

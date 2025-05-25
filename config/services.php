@@ -31,4 +31,10 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'ifix_api' => [
+        'base_url' => env('IFIX_API_BASE_URL', 'http://localhost:8000/api/v1'),
+        'token' => env('IFIX_API_TOKEN'),
+        'timeout' => env('IFIX_API_TIMEOUT', 30),
+    ],
+
 ];

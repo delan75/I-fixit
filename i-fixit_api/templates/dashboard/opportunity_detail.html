@@ -1,0 +1,306 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}{{ opportunity.year }} {{ opportunity.make }} {{ opportunity.model }} - I-fixit{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            {{ opportunity.year }} {{ opportunity.make }} {{ opportunity.model }}
+        </h1>
+        <a href="{{ opportunity.listing_url }}" target="_blank" class="btn btn-primary">
+            <i class="fas fa-external-link-alt"></i> View Original Listing
+        </a>
+    </div>
+
+    <!-- Status and Score Row -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow h-100">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Status</h6>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="dropdownMenuButton"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            Update Status
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            {% for status_value, status_label in status_choices %}
+                            <li>
+                                <a class="dropdown-item update-status" href="#"
+                                   data-opportunity-id="{{ opportunity.id }}"
+                                   data-status="{{ status_value }}">
+                                    {{ status_label }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Current Status</h4>
+                            <span class="badge badge-{{ opportunity.status }} badge-lg" id="status-badge-{{ opportunity.id }}">
+                                {{ opportunity.get_status_display }}
+                            </span>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Source</h4>
+                            <p>{{ opportunity.source }}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h4>Created</h4>
+                            <p>{{ opportunity.created_at|date:"M d, Y H:i" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Last Updated</h4>
+                            <p>{{ opportunity.updated_at|date:"M d, Y H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Opportunity Score</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-4 text-center">
+                            <div class="opportunity-score-large
+                                {% if opportunity.opportunity_score >= 75 %}score-high
+                                {% elif opportunity.opportunity_score >= 50 %}score-medium
+                                {% else %}score-low{% endif %}"
+                                style="width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 2rem; font-weight: bold; color: white;">
+                                {{ opportunity.opportunity_score }}
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <h4>Score Factors</h4>
+                            <ul class="list-unstyled">
+                                {% if opportunity.year %}
+                                <li><i class="fas fa-calendar-alt me-2"></i> {{ opportunity.year }} model ({{ vehicle_age }} years old)</li>
+                                {% endif %}
+
+                                {% if opportunity.has_keys %}
+                                <li><i class="fas fa-key me-2 text-success"></i> Has keys</li>
+                                {% else %}
+                                <li><i class="fas fa-key me-2 text-danger"></i> No keys</li>
+                                {% endif %}
+
+                                {% if opportunity.has_spare_key %}
+                                <li><i class="fas fa-key me-2 text-success"></i> Has spare key</li>
+                                {% endif %}
+
+                                {% if opportunity.vehicle_starts %}
+                                <li><i class="fas fa-car me-2 text-success"></i> Vehicle starts</li>
+                                {% else %}
+                                <li><i class="fas fa-car me-2 text-danger"></i> Vehicle doesn't start</li>
+                                {% endif %}
+
+                                {% if opportunity.vehicle_code %}
+                                <li><i class="fas fa-tag me-2"></i> {{ opportunity.get_vehicle_code_display }}</li>
+                                {% endif %}
+
+                                {% if opportunity.odometer %}
+                                <li><i class="fas fa-tachometer-alt me-2 {% if opportunity.odometer|stringformat:'s'|cut:' '|cut:'km'|cut:'KM'|cut:','|cut:'.'|stringformat:'d' < 100000 %}text-success{% elif opportunity.odometer|stringformat:'s'|cut:' '|cut:'km'|cut:'KM'|cut:','|cut:'.'|stringformat:'d' < 150000 %}text-warning{% else %}text-danger{% endif %}"></i> {{ opportunity.odometer }}</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vehicle Details Row -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Vehicle Details</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Make</h4>
+                            <p>{{ opportunity.make }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Model</h4>
+                            <p>{{ opportunity.model }}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h4>Year</h4>
+                            <p>{{ opportunity.year }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Vehicle Code</h4>
+                            <p>{{ opportunity.get_vehicle_code_display }}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h4>Stock Number</h4>
+                            <p>{{ opportunity.stock_number|default:"Not available" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Odometer</h4>
+                            <p>{{ opportunity.odometer|default:"Not available" }}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h4>Features</h4>
+                            <ul class="list-unstyled">
+                                <li>
+                                    {% if opportunity.has_keys %}
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    {% else %}
+                                    <i class="fas fa-times-circle text-danger me-2"></i>
+                                    {% endif %}
+                                    Has Keys
+                                </li>
+                                <li>
+                                    {% if opportunity.has_spare_key %}
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    {% else %}
+                                    <i class="fas fa-times-circle text-danger me-2"></i>
+                                    {% endif %}
+                                    Has Spare Key
+                                </li>
+                                <li>
+                                    {% if opportunity.vehicle_starts %}
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    {% else %}
+                                    <i class="fas fa-times-circle text-danger me-2"></i>
+                                    {% endif %}
+                                    Vehicle Starts
+                                </li>
+                                <li>
+                                    {% if opportunity.has_battery %}
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    {% else %}
+                                    <i class="fas fa-times-circle text-danger me-2"></i>
+                                    {% endif %}
+                                    Has Battery
+                                </li>
+                                <li>
+                                    {% if opportunity.has_spare_wheel %}
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    {% else %}
+                                    <i class="fas fa-times-circle text-danger me-2"></i>
+                                    {% endif %}
+                                    Has Spare Wheel
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Auction Details</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Current Bid</h4>
+                            <p>{% if opportunity.current_bid %}R {{ opportunity.current_bid }}{% else %}Not available{% endif %}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Auction End Date</h4>
+                            <p>{% if opportunity.auction_end_date %}{{ opportunity.auction_end_date|date:"M d, Y H:i" }}{% else %}Not available{% endif %}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h4>Lot Number</h4>
+                            <p>{{ opportunity.lot_number|default:"Not available" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Auction Location</h4>
+                            <p>{{ opportunity.auction_location|default:"Not available" }}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <h4>Damage Description</h4>
+                            <p>{{ opportunity.damage_description|default:"Not available" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Financial Details Row -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Financial Assessment</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h4>Current Bid</h4>
+                            <p class="h3">{% if opportunity.current_bid %}R {{ opportunity.current_bid }}{% else %}Not available{% endif %}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h4>Estimated Repair Cost</h4>
+                            <p class="h3">{% if opportunity.estimated_repair_cost %}R {{ opportunity.estimated_repair_cost }}{% else %}Not available{% endif %}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h4>Estimated Market Value</h4>
+                            <p class="h3">{% if opportunity.estimated_market_value %}R {{ opportunity.estimated_market_value }}{% else %}Not available{% endif %}</p>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <h4>Potential Profit</h4>
+                            <div class="progress" style="height: 30px;">
+                                {% if opportunity.potential_profit %}
+                                <div class="progress-bar bg-success" role="progressbar"
+                                     style="width: {% widthratio opportunity.potential_profit|floatformat:0|default:0 100000 100 %}%;"
+                                     aria-valuenow="{{ opportunity.potential_profit|floatformat:0|default:0 }}"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100000">
+                                    R {{ opportunity.potential_profit|floatformat:0|default:0 }}
+                                </div>
+                                {% else %}
+                                <div class="progress-bar bg-secondary" role="progressbar" style="width: 100%;">
+                                    Not available
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CSRF Token for AJAX -->
+{% csrf_token %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .badge-lg {
+        font-size: 1rem;
+        padding: 0.5rem 1rem;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,136 @@
+/* Dashboard Styles */
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer {
+    margin-top: auto;
+}
+
+/* Card styles */
+.card {
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    border: none;
+    border-radius: 0.35rem;
+}
+
+.card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+/* Opportunity card styles */
+.opportunity-card {
+    transition: transform 0.3s ease;
+}
+
+.opportunity-card:hover {
+    transform: translateY(-5px);
+}
+
+.opportunity-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.opportunity-score {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+.score-high {
+    background-color: #28a745;
+}
+
+.score-medium {
+    background-color: #ffc107;
+}
+
+.score-low {
+    background-color: #dc3545;
+}
+
+/* Filter section */
+.filter-section {
+    background-color: #f8f9fc;
+    padding: 1rem;
+    border-radius: 0.35rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Status badges */
+.badge-new {
+    background-color: #4e73df;
+}
+
+.badge-viewed {
+    background-color: #858796;
+}
+
+.badge-interested {
+    background-color: #1cc88a;
+}
+
+.badge-bidding {
+    background-color: #f6c23e;
+}
+
+.badge-won {
+    background-color: #36b9cc;
+}
+
+.badge-lost {
+    background-color: #e74a3b;
+}
+
+.badge-expired {
+    background-color: #5a5c69;
+}
+
+/* Dashboard summary cards */
+.summary-card {
+    border-left: 0.25rem solid;
+}
+
+.summary-card-primary {
+    border-left-color: #4e73df;
+}
+
+.summary-card-success {
+    border-left-color: #1cc88a;
+}
+
+.summary-card-info {
+    border-left-color: #36b9cc;
+}
+
+.summary-card-warning {
+    border-left-color: #f6c23e;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .opportunity-card .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .opportunity-score {
+        position: static;
+        margin-bottom: 10px;
+    }
+}

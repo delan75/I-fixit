@@ -1,0 +1,234 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Opportunities - I-fixit{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Opportunities</h1>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Filter Opportunities</h6>
+        </div>
+        <div class="card-body">
+            <form id="filter-form" method="get" class="row g-3">
+                <!-- Make Filter -->
+                <div class="col-md-2">
+                    <label for="make" class="form-label">Make</label>
+                    <select class="form-select" id="make" name="make">
+                        <option value="">All Makes</option>
+                        {% for make in all_makes %}
+                        <option value="{{ make }}" {% if filters.make == make %}selected{% endif %}>{{ make }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Model Filter -->
+                <div class="col-md-2">
+                    <label for="model" class="form-label">Model</label>
+                    <select class="form-select" id="model" name="model">
+                        <option value="">All Models</option>
+                        {% for model in all_models %}
+                        <option value="{{ model }}" {% if filters.model == model %}selected{% endif %}>{{ model }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Year Filter -->
+                <div class="col-md-2">
+                    <label for="year" class="form-label">Year</label>
+                    <select class="form-select" id="year" name="year">
+                        <option value="">All Years</option>
+                        {% for year in all_years %}
+                        <option value="{{ year }}" {% if filters.year == year|stringformat:"i" %}selected{% endif %}>{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Status Filter -->
+                <div class="col-md-2">
+                    <label for="status" class="form-label">Status</label>
+                    <select class="form-select" id="status" name="status">
+                        <option value="">All Statuses</option>
+                        {% for status_value, status_label in status_choices %}
+                        <option value="{{ status_value }}" {% if filters.status == status_value %}selected{% endif %}>{{ status_label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Min Score Filter -->
+                <div class="col-md-2">
+                    <label for="min_score" class="form-label">Min Score</label>
+                    <input type="number" class="form-control" id="min_score" name="min_score" min="0" max="100" value="{{ filters.min_score }}">
+                </div>
+                
+                <!-- Source Filter -->
+                <div class="col-md-2">
+                    <label for="source" class="form-label">Source</label>
+                    <select class="form-select" id="source" name="source">
+                        <option value="">All Sources</option>
+                        {% for source in all_sources %}
+                        <option value="{{ source }}" {% if filters.source == source %}selected{% endif %}>{{ source }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Sort By -->
+                <div class="col-md-3">
+                    <label for="sort_by" class="form-label">Sort By</label>
+                    <select class="form-select" id="sort_by" name="sort_by">
+                        <option value="-opportunity_score" {% if filters.sort_by == '-opportunity_score' %}selected{% endif %}>Score (High to Low)</option>
+                        <option value="opportunity_score" {% if filters.sort_by == 'opportunity_score' %}selected{% endif %}>Score (Low to High)</option>
+                        <option value="-created_at" {% if filters.sort_by == '-created_at' %}selected{% endif %}>Newest First</option>
+                        <option value="created_at" {% if filters.sort_by == 'created_at' %}selected{% endif %}>Oldest First</option>
+                        <option value="-year" {% if filters.sort_by == '-year' %}selected{% endif %}>Year (Newest First)</option>
+                        <option value="year" {% if filters.sort_by == 'year' %}selected{% endif %}>Year (Oldest First)</option>
+                        <option value="make" {% if filters.sort_by == 'make' %}selected{% endif %}>Make (A-Z)</option>
+                        <option value="-make" {% if filters.sort_by == '-make' %}selected{% endif %}>Make (Z-A)</option>
+                    </select>
+                </div>
+                
+                <!-- Filter Buttons -->
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">Apply Filters</button>
+                    <button type="button" id="clear-filters" class="btn btn-secondary">Clear Filters</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Opportunities List -->
+    <div class="row">
+        {% if opportunities %}
+            {% for opportunity in opportunities %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card shadow h-100 opportunity-card">
+                    <!-- Card Header -->
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            {{ opportunity.year }} {{ opportunity.make }} {{ opportunity.model }}
+                        </h6>
+                        <div class="opportunity-score 
+                            {% if opportunity.opportunity_score >= 75 %}score-high
+                            {% elif opportunity.opportunity_score >= 50 %}score-medium
+                            {% else %}score-low{% endif %}">
+                            {{ opportunity.opportunity_score }}
+                        </div>
+                    </div>
+                    
+                    <!-- Card Body -->
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <span class="badge badge-{{ opportunity.status }}" id="status-badge-{{ opportunity.id }}">
+                                {{ opportunity.get_status_display }}
+                            </span>
+                            <span class="badge bg-secondary">{{ opportunity.source }}</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {% if opportunity.current_bid %}
+                            <p class="mb-1"><strong>Current Bid:</strong> R {{ opportunity.current_bid }}</p>
+                            {% endif %}
+                            
+                            {% if opportunity.auction_end_date %}
+                            <p class="mb-1"><strong>Auction Ends:</strong> {{ opportunity.auction_end_date|date:"M d, Y H:i" }}</p>
+                            {% endif %}
+                            
+                            {% if opportunity.has_keys %}
+                            <p class="mb-1"><i class="fas fa-key text-success"></i> Has Keys</p>
+                            {% endif %}
+                            
+                            {% if opportunity.vehicle_starts %}
+                            <p class="mb-1"><i class="fas fa-car text-success"></i> Vehicle Starts</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'dashboard:opportunity_detail' opportunity.id %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-eye"></i> View Details
+                            </a>
+                            
+                            <div class="dropdown">
+                                <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton{{ opportunity.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-cog"></i> Actions
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ opportunity.id }}">
+                                    {% if opportunity.status != 'interested' %}
+                                    <li>
+                                        <a class="dropdown-item update-status" href="#" 
+                                           data-opportunity-id="{{ opportunity.id }}" 
+                                           data-status="interested">
+                                            <i class="fas fa-star text-warning"></i> Mark as Interested
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    
+                                    {% if opportunity.status != 'bidding' %}
+                                    <li>
+                                        <a class="dropdown-item update-status" href="#" 
+                                           data-opportunity-id="{{ opportunity.id }}" 
+                                           data-status="bidding">
+                                            <i class="fas fa-gavel text-primary"></i> Mark as Bidding
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    
+                                    {% if opportunity.status != 'won' %}
+                                    <li>
+                                        <a class="dropdown-item update-status" href="#" 
+                                           data-opportunity-id="{{ opportunity.id }}" 
+                                           data-status="won">
+                                            <i class="fas fa-trophy text-success"></i> Mark as Won
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    
+                                    {% if opportunity.status != 'lost' %}
+                                    <li>
+                                        <a class="dropdown-item update-status" href="#" 
+                                           data-opportunity-id="{{ opportunity.id }}" 
+                                           data-status="lost">
+                                            <i class="fas fa-times text-danger"></i> Mark as Lost
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    
+                                    <li><hr class="dropdown-divider"></li>
+                                    
+                                    <li>
+                                        <a class="dropdown-item" href="{{ opportunity.listing_url }}" target="_blank">
+                                            <i class="fas fa-external-link-alt"></i> View Listing
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-search fa-3x mb-3 text-gray-300"></i>
+                    <h5>No opportunities found</h5>
+                    <p>Try adjusting your filters or run a scraper to find new opportunities.</p>
+                    <a href="{% url 'dashboard:scrapers' %}" class="btn btn-primary">
+                        <i class="fas fa-spider"></i> Go to Scrapers
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- CSRF Token for AJAX -->
+{% csrf_token %}
+{% endblock %}

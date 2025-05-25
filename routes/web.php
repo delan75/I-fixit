@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\ApiIntegrationController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
@@ -157,6 +158,12 @@ Route::middleware('auth')->group(function () {
         Route::get('contact-messages', [ContactController::class, 'adminIndex'])->name('contact.admin.index');
         Route::get('contact-messages/{contact}', [ContactController::class, 'adminShow'])->name('contact.admin.show');
         Route::delete('contact-messages/{contact}', [ContactController::class, 'adminDestroy'])->name('contact.admin.destroy');
+
+        // API Integration routes (admin only)
+        Route::get('api-integration', [ApiIntegrationController::class, 'index'])->name('api-integration.index');
+        Route::post('api-integration/sync-opportunities', [ApiIntegrationController::class, 'syncOpportunities'])->name('api-integration.sync-opportunities');
+        Route::post('api-integration/trigger-scraping', [ApiIntegrationController::class, 'triggerScraping'])->name('api-integration.trigger-scraping');
+        Route::get('api-integration/market-analysis/{car}', [ApiIntegrationController::class, 'getMarketAnalysis'])->name('api-integration.market-analysis');
     });
 
     // Superuser-only routes

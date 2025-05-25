@@ -1,0 +1,95 @@
+{% extends "admin/base_site.html" %}
+
+{% block title %}Scraping Jobs{% endblock %}
+
+{% block content %}
+<div class="module">
+    <h1>Scraping Jobs</h1>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Auction Site</th>
+                <th>Status</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Opportunities Created</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for job in jobs %}
+            <tr>
+                <td>{{ job.id }}</td>
+                <td>{{ job.auction_site.name }}</td>
+                <td>{{ job.get_status_display }}</td>
+                <td>{{ job.start_time|default:"-" }}</td>
+                <td>{{ job.end_time|default:"-" }}</td>
+                <td>{{ job.opportunities_created }}</td>
+                <td>
+                    <a href="{% url 'scrapers:job_detail' job.id %}">View</a>
+                    {% if job.status == 'pending' %}
+                    | <a href="#" class="run-job" data-job-id="{{ job.id }}">Run</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">No scraping jobs found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const runButtons = document.querySelectorAll('.run-job');
+        
+        runButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const jobId = this.getAttribute('data-job-id');
+                
+                fetch(`/scrapers/jobs/${jobId}/run/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('Job started successfully!');
+                        window.location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('Error: ' + error);
+                });
+            });
+        });
+        
+        // Function to get CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+{% endblock %}

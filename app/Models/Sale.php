@@ -26,6 +26,14 @@ class Sale extends Model
         'commission',
         'fees',
         'notes',
+        'buyer_finance_type',
+        'buyer_finance_institution',
+        'finance_approved_amount',
+        'deposit_amount',
+        'outstanding_balance',
+        'finance_approval_date',
+        'full_payment_date',
+        'finance_notes',
     ];
 
     /**
@@ -40,6 +48,11 @@ class Sale extends Model
         'sale_date' => 'date',
         'commission' => 'decimal:2',
         'fees' => 'decimal:2',
+        'finance_approved_amount' => 'decimal:2',
+        'deposit_amount' => 'decimal:2',
+        'outstanding_balance' => 'decimal:2',
+        'finance_approval_date' => 'date',
+        'full_payment_date' => 'date',
     ];
 
     /**
